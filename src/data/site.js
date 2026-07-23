@@ -413,8 +413,6 @@ export const resume = {
 };
 
 export const socials = [
-  { label: 'Instagram', href: 'https://instagram.com/' },
-  { label: 'Behance', href: 'https://behance.net/' },
-  { label: 'Vimeo', href: 'https://vimeo.com/' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/' },
+  { label: 'Behance', href: 'https://www.behance.net/rshashwata' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/roy-shashwata/' },
 ];
