@@ -1,0 +1,251 @@
+---
+import { projects, categories } from '../data/site.js';
+// Same data + filter contract as Work.astro (data-work-row / data-cat /
+// data-filter) so the existing filter logic in main.js works unchanged.
+const tabs = [{ key: 'all', label: 'All' }, ...categories];
+---
+
+<section class="gallery section" id="work" data-work>
+  <div class="wrap">
+    <div class="gallery__head">
+      <h2 class="display gallery__title" data-reveal>Selected Work</h2>
+    </div>
+
+    <div class="work__filters" data-reveal role="tablist" aria-label="Filter work by category">
+      {
+        tabs.map((t, i) => (
+          <button
+            class:list={['work__filter', { 'is-active': i === 0 }]}
+            data-filter={t.key}
+            type="button"
+          >
+            {t.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="gallery__grid">
+      {
+        projects.map((p, i) => (
+          <a
+            class="gallery__card"
+            href={`/work/${p.id}`}
+            data-work-row
+            data-reveal
+            data-cat={p.cat}
+            data-accent={p.accent}
+            data-size={i % 6}
+            data-cursor="View"
+            style={`--a:${p.accent}`}
+          >
+            <div class="gallery__media">
+              {p.media ? (
+                <img src={p.media} alt={p.title} loading="lazy" />
+              ) : (
+                <span class="gallery__watermark">{p.no}</span>
+              )}
+              <span class="gallery__view">View ↗</span>
+            </div>
+            <div class="gallery__info">
+              <h3 class="gallery__name display">{p.title}</h3>
+              <span class="gallery__meta">
+                {p.category} · {p.year}
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .gallery__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 6vh, 4rem);
+  }
+  .gallery__title {
+    font-size: var(--step-2);
+  }
+
+  /* Filter bar — kept in sync with Work.astro so both variants match. */
+  .work__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+  .work__filter {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    transition: color 0.3s var(--ease), background 0.3s var(--ease),
+      border-color 0.3s var(--ease);
+  }
+  .work__filter:hover {
+    color: var(--fg);
+    border-color: var(--fg);
+  }
+  .work__filter.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  /* Asymmetric editorial grid: 12 columns, small auto-rows that cards span
+     to get varied widths AND heights. `dense` keeps the packing tight when
+     a category filter hides some cards. Sizes are assigned per-card
+     (data-size, stable across filtering) rather than via :nth-child. */
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: clamp(72px, 9vw, 120px);
+    grid-auto-flow: dense;
+    gap: clamp(1rem, 2.4vw, 2rem);
+  }
+  .gallery__card[hidden] {
+    display: none;
+  }
+
+  /* Desktop spans — consecutive pairs sum to 12 for clean rows;
+     mixed row spans (5/6) create the asymmetric, big-image rhythm. */
+  .gallery__card[data-size='0'] { grid-column: span 7; grid-row: span 6; }
+  .gallery__card[data-size='1'] { grid-column: span 5; grid-row: span 6; }
+  .gallery__card[data-size='2'] { grid-column: span 6; grid-row: span 5; }
+  .gallery__card[data-size='3'] { grid-column: span 6; grid-row: span 5; }
+  .gallery__card[data-size='4'] { grid-column: span 5; grid-row: span 5; }
+  .gallery__card[data-size='5'] { grid-column: span 7; grid-row: span 5; }
+
+  .gallery__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    min-height: 0;
+  }
+  .gallery__media {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(120% 120% at 25% 15%, var(--a), #000 92%);
+    isolation: isolate;
+  }
+  .gallery__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s var(--ease);
+  }
+  .gallery__card:hover .gallery__media img {
+    transform: scale(1.06);
+  }
+  /* Placeholder watermark number */
+  .gallery__watermark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(4rem, 14vw, 8rem);
+    color: #000;
+    opacity: 0.28;
+    mix-blend-mode: overlay;
+    transition: transform 0.6s var(--ease), opacity 0.4s var(--ease);
+  }
+  .gallery__card:hover .gallery__watermark {
+    transform: scale(1.15);
+    opacity: 0.15;
+  }
+  /* Hover "View" chip */
+  .gallery__view {
+    position: absolute;
+    inset: auto auto 1rem 1rem;
+    z-index: 2;
+    background: var(--accent);
+    color: #000;
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5em 0.9em;
+    border-radius: 999px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  }
+  .gallery__card:hover .gallery__view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Accent ring on hover */
+  .gallery__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 0 var(--a);
+    transition: box-shadow 0.4s var(--ease);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .gallery__card:hover .gallery__media::after {
+    box-shadow: inset 0 0 0 3px var(--a);
+  }
+
+  .gallery__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .gallery__name {
+    font-size: clamp(1.4rem, 2.8vw, 2.6rem);
+    line-height: 1;
+    transition: color 0.3s var(--ease);
+  }
+  .gallery__card:hover .gallery__name {
+    color: var(--a);
+  }
+  .gallery__meta {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+  }
+
+  /* Tablet: collapse to a 6-column grid, keep the size variety. */
+  @media (max-width: 1100px) {
+    .gallery__grid {
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: clamp(80px, 13vw, 130px);
+    }
+    .gallery__card[data-size='0'] { grid-column: span 4; grid-row: span 4; }
+    .gallery__card[data-size='1'] { grid-column: span 2; grid-row: span 4; }
+    .gallery__card[data-size='2'] { grid-column: span 3; grid-row: span 3; }
+    .gallery__card[data-size='3'] { grid-column: span 3; grid-row: span 3; }
+    .gallery__card[data-size='4'] { grid-column: span 2; grid-row: span 3; }
+    .gallery__card[data-size='5'] { grid-column: span 4; grid-row: span 3; }
+  }
+
+  /* Mobile: single column, each card a generous portrait image. */
+  @media (max-width: 640px) {
+    .gallery__grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+    }
+    .gallery__card[data-size] {
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .gallery__media {
+      flex: none;
+      aspect-ratio: 4 / 5;
+    }
+  }
+</style>

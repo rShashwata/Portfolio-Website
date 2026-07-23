@@ -1,0 +1,89 @@
+---
+import { about } from '../data/site.js';
+// Split the statement into words so each can rise on scroll.
+const words = about.statement.split(' ');
+---
+
+<section class="about section" id="about" data-about>
+  <div class="wrap">
+
+    <p class="about__statement display-soft" data-about-statement>
+      {
+        words.map((w) => (
+          <span class="about__word-wrap">
+            <span class="about__word" data-about-word>
+              {w}&nbsp;
+            </span>
+          </span>
+        ))
+      }
+    </p>
+
+    <div class="about__stats">
+      {
+        about.stats.map((s) => (
+          <div class="about__stat" data-reveal>
+            <span class="about__stat-val display">{s.value}</span>
+            <span class="about__stat-label">{s.label}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    background: var(--bg-soft);
+  }
+  .about__label {
+    margin-bottom: clamp(2rem, 5vh, 3.5rem);
+  }
+  .about__statement {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-transform: none;
+    font-size: clamp(1.6rem, 1rem + 3.6vw, 4.2rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    max-width: 22ch;
+  }
+  .about__word-wrap {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+  .about__word {
+    display: inline-block;
+    will-change: transform;
+  }
+  .about__stats {
+    margin-top: clamp(3rem, 9vh, 6rem);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(1.5rem, 4vh, 3rem);
+  }
+  .about__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .about__stat-val {
+    font-size: var(--step-2);
+    color: var(--accent-ink);
+  }
+  .about__stat-label {
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  @media (max-width: 720px) {
+    .about__stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem 1.5rem;
+    }
+  }
+</style>

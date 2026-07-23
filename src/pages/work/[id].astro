@@ -1,0 +1,267 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ThemeToggle from '../../components/ThemeToggle.astro';
+import Logo from '../../components/Logo.astro';
+import { projects, profile } from '../../data/site.js';
+
+// One detail "post" per project, with a link to the next one.
+export function getStaticPaths() {
+  return projects.map((p, i) => ({
+    params: { id: p.id },
+    props: { project: p, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+const { project, next } = Astro.props;
+// Real case-study images if the project provides a `gallery` array,
+// otherwise fall back to 4 placeholder tiles.
+const galleryImages =
+  Array.isArray(project.gallery) && project.gallery.length ? project.gallery : null;
+const placeholders = [0, 1, 2, 3];
+---
+
+<Layout title={`${project.title} — ${profile.name}`} description={project.description[0]}>
+  <header class="post-head">
+    <a class="post-head__brand" href="/" data-cursor="Home" aria-label={`${profile.name} — home`}><Logo /></a>
+    <div class="post-head__right">
+      <a class="post-head__back" href="/#work" data-cursor="Index">Index ↗</a>
+      <ThemeToggle />
+    </div>
+  </header>
+
+  <main class="post" style={`--a:${project.accent}`}>
+    <!-- Title block -->
+    <section class="post__intro section">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal>{project.category}</p>
+        <h1 class="display post__title" data-reveal>{project.title}</h1>
+        <ul class="post__meta">
+          <li data-reveal><span class="post__meta-k">Client</span>{project.client}</li>
+          <li data-reveal><span class="post__meta-k">Role</span>{project.role}</li>
+          <li data-reveal><span class="post__meta-k">Year</span>{project.year}</li>
+          <li data-reveal>
+            <span class="post__meta-k">Services</span>{project.services.join(', ')}
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Featured media -->
+    <div class="wrap">
+      <figure class="post__hero" data-reveal>
+        {
+          project.media ? (
+            <img src={project.media} alt={project.title} />
+          ) : (
+            <span class="post__hero-label">{project.title}</span>
+          )
+        }
+      </figure>
+    </div>
+
+    <!-- Description -->
+    <section class="post__body section">
+      <div class="wrap post__body-grid">
+        <h2 class="display post__body-title" data-reveal>Overview</h2>
+        <div class="post__copy">
+          {project.description.map((para) => <p data-reveal>{para}</p>)}
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="post__gallery section">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal>Gallery</p>
+        <div class="post__grid">
+          {
+            galleryImages
+              ? galleryImages.map((src, i) => (
+                  <figure class:list={['post__tile', { 'post__tile--wide': i === 0 }]} data-reveal>
+                    <img src={src} alt={`${project.title} — image ${i + 1}`} loading="lazy" />
+                  </figure>
+                ))
+              : placeholders.map((g) => (
+                  <div class:list={['post__tile', { 'post__tile--wide': g === 0 }]} data-reveal />
+                ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Next project -->
+    <a class="post__next" href={`/work/${next.id}`} data-cursor="Next" style={`--a:${next.accent}`}>
+      <div class="wrap">
+        <span class="eyebrow">Next project</span>
+        <span class="display post__next-title">{next.title}</span>
+        <span class="post__next-cat">{next.category} →</span>
+      </div>
+    </a>
+  </main>
+</Layout>
+
+<style>
+  .post-head {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(1rem, 2.5vw, 1.6rem) var(--pad);
+    color: var(--fg);
+  }
+  .post-head__brand {
+    color: var(--fg);
+  }
+  /* Blend only the back link + toggle, so the logo keeps its true colours. */
+  .post-head__right {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1.4rem);
+    mix-blend-mode: difference;
+    color: #fff;
+  }
+  .post-head__back {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .post__intro {
+    padding-top: clamp(7rem, 16vh, 11rem);
+  }
+  .post__title {
+    font-size: var(--step-huge);
+    margin: 0.2em 0 0.5em;
+  }
+  .post__meta {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(1.2rem, 3vh, 2rem);
+  }
+  .post__meta li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: var(--step-0);
+  }
+  .post__meta-k {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-dim);
+  }
+
+  .post__hero {
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(120% 120% at 25% 15%, var(--a), #000 92%);
+  }
+  .post__hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .post__hero-label {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #000;
+    mix-blend-mode: overlay;
+    font-size: clamp(2rem, 8vw, 6rem);
+  }
+
+  .post__body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: clamp(1.5rem, 5vw, 5rem);
+  }
+  .post__body-title {
+    font-size: var(--step-2);
+  }
+  .post__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    max-width: 60ch;
+  }
+
+  .post__grid {
+    margin-top: clamp(1.5rem, 4vh, 2.5rem);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.8rem, 2vw, 1.5rem);
+  }
+  .post__tile {
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--a), #000 95%);
+    opacity: 0.85;
+    margin: 0;
+  }
+  .post__tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .post__tile--wide {
+    grid-column: 1 / -1;
+    aspect-ratio: 21 / 9;
+  }
+
+  .post__next {
+    display: block;
+    border-top: 1px solid var(--line);
+    padding: clamp(3rem, 10vh, 7rem) 0;
+    transition: background 0.5s var(--ease);
+  }
+  .post__next:hover {
+    background: var(--a);
+  }
+  .post__next .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-inline: var(--pad);
+  }
+  .post__next-title {
+    font-size: var(--step-2);
+    transition: color 0.4s var(--ease);
+  }
+  .post__next:hover .post__next-title,
+  .post__next:hover .eyebrow,
+  .post__next:hover .post__next-cat {
+    color: #000;
+  }
+  .post__next-cat {
+    font-size: var(--step-0);
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 820px) {
+    .post__meta {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 1rem;
+    }
+    .post__body-grid {
+      grid-template-columns: 1fr;
+    }
+    .post__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

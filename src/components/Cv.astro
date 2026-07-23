@@ -1,0 +1,160 @@
+---
+import { cv } from '../data/site.js';
+---
+
+<section class="cv section" id="cv" data-cv>
+  <div class="wrap">
+    <div class="cv__head">
+      <h2 class="display cv__title" data-reveal>Curriculum<br />Vitae</h2>
+      <a class="cv__download magnetic" href={cv.resumeUrl} data-cursor="View">
+        <span class="magnetic__inner">View CV ↓</span>
+      </a>
+    </div>
+
+    <div class="cv__grid">
+      <!-- Experience -->
+      <div class="cv__col cv__col--wide">
+        <h3 class="cv__col-title eyebrow" data-reveal>Work Experience</h3>
+        <ul class="cv__timeline">
+          {
+            cv.experience.map((e) => (
+              <li class="cv__item" data-reveal>
+                <div class="cv__item-top">
+                  <span class="cv__role">{e.role}</span>
+                  <span class="cv__period">{e.period}</span>
+                </div>
+                <span class="cv__org accent">{e.org}</span>
+                <p class="cv__note">{e.note}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Sidebar: education, software, services -->
+      <div class="cv__col">
+        <h3 class="cv__col-title eyebrow" data-reveal>Education</h3>
+        {
+          cv.education.map((ed) => (
+            <div class="cv__edu" data-reveal>
+              <span class="cv__role">{ed.title}</span>
+              <span class="cv__org accent">{ed.org}</span>
+              <span class="cv__period">{ed.period}</span>
+            </div>
+          ))
+        }
+
+        <h3 class="cv__col-title eyebrow cv__col-title--gap" data-reveal>Software</h3>
+        <ul class="cv__tags" data-reveal>
+          {cv.software.map((s) => <li class="cv__tag">{s}</li>)}
+        </ul>
+
+        <h3 class="cv__col-title eyebrow cv__col-title--gap" data-reveal>Services</h3>
+        <ul class="cv__tags" data-reveal>
+          {cv.services.map((s) => <li class="cv__tag cv__tag--accent">{s}</li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cv {
+    background: var(--bg);
+  }
+  .cv__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: clamp(2.5rem, 7vh, 5rem);
+  }
+  .cv__title {
+    font-size: var(--step-2);
+    line-height: 0.9;
+  }
+  .cv__download {
+    display: inline-block;
+    border: 1px solid var(--fg);
+    border-radius: 999px;
+    padding: 0.9rem 1.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--step--1);
+    overflow: hidden;
+    transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  }
+  .cv__download:hover {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .cv__grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  .cv__col-title {
+    margin-bottom: 1.5rem;
+  }
+  .cv__col-title--gap {
+    margin-top: 2.5rem;
+  }
+  .cv__timeline {
+    list-style: none;
+  }
+  .cv__item,
+  .cv__edu {
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .cv__item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .cv__role {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    line-height: 1.05;
+  }
+  .cv__period {
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+    white-space: nowrap;
+  }
+  .cv__org {
+    font-size: var(--step-0);
+  }
+  .cv__note {
+    color: var(--fg-dim);
+    max-width: 48ch;
+  }
+  .cv__tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .cv__tag {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-size: var(--step--1);
+  }
+  .cv__tag--accent {
+    border-color: var(--accent-ink);
+    color: var(--accent-ink);
+  }
+  @media (max-width: 860px) {
+    .cv__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

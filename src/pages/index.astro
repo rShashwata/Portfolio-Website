@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Preloader from '../components/Preloader.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import Work from '../components/Work.astro';
+import About from '../components/About.astro';
+import Cv from '../components/Cv.astro';
+import Contact from '../components/Contact.astro';
+import { profile } from '../data/site.js';
+---
+
+<Layout>
+  <Preloader />
+  <Nav />
+  <main>
+    <Hero />
+    <Marquee items={profile.keywords} accent />
+    <About />
+    <Marquee items={['Design', 'Edit', 'Motion', 'Color', 'Direct', 'Repeat']} reverse />
+    <Work />
+    <Cv />
+    <Contact />
+  </main>
+</Layout>
+
+<style is:global>
+  /* Magnetic buttons share this inner-wrapper transform target. */
+  .magnetic {
+    display: inline-block;
+    will-change: transform;
+  }
+  .magnetic__inner {
+    display: inline-block;
+    will-change: transform;
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+import { profile, socials } from '../data/site.js';
+---
+
+<footer class="contact section" id="contact" data-contact>
+  <div class="wrap">
+    <p class="eyebrow contact__label" data-reveal>(Contact)</p>
+
+    <h2 class="display contact__big" data-reveal>Let's make<br />something loud.</h2>
+
+    <a class="contact__email magnetic" href={`mailto:${profile.email}`} data-cursor="Email">
+      <span class="magnetic__inner">{profile.email}</span>
+    </a>
+
+    <div class="contact__socials">
+      {
+        socials.map((s) => (
+          <a class="contact__social" href={s.href} target="_blank" rel="noopener" data-cursor="↗">
+            {s.label}
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="contact__base">
+      <span>© {new Date().getFullYear()} {profile.name}</span>
+      <span>{profile.location}</span>
+      <span>Built with Astro + GSAP</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .contact {
+    background: var(--bg-soft);
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+  }
+  .contact__label {
+    margin-bottom: clamp(1.5rem, 4vh, 3rem);
+  }
+  .contact__big {
+    font-size: var(--step-huge);
+    line-height: 0.9;
+    margin-bottom: clamp(2rem, 6vh, 4rem);
+  }
+  .contact__email {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.4rem, 5vw, 3.4rem);
+    letter-spacing: -0.01em;
+    border-bottom: 2px solid var(--accent-ink);
+    padding-bottom: 0.1em;
+  }
+  .contact__socials {
+    margin-top: clamp(2.5rem, 7vh, 5rem);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 2.5rem;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(1.5rem, 4vh, 3rem);
+  }
+  .contact__social {
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--step-0);
+  }
+  .contact__social::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s var(--ease);
+  }
+  .contact__social:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .contact__base {
+    margin-top: clamp(3rem, 9vh, 6rem);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    justify-content: space-between;
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+</style>

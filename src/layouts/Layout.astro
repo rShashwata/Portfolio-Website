@@ -1,0 +1,72 @@
+---
+import '../styles/global.css';
+import { profile } from '../data/site.js';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${profile.name} — ${profile.title}`,
+  description = profile.tagline,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+
+    <!-- Add the `js` class as early as possible so the no-JS fallback
+         (visible content) only gets hidden when JS is actually running.
+         Also resolve the theme before paint to avoid a flash. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t !== 'light' && t !== 'dark') {
+            t = window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Custom cursor (hidden on touch devices via CSS) -->
+    <div class="cursor" aria-hidden="true"></div>
+    <div class="cursor__label" aria-hidden="true"></div>
+
+    <slot />
+
+    <!-- All motion lives here: Lenis smooth scroll + GSAP timelines. -->
+    <script>
+      import '../scripts/main.js';
+    </script>
+  </body>
+</html>

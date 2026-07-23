@@ -1,0 +1,152 @@
+---
+import { profile } from '../data/site.js';
+import ThemeToggle from './ThemeToggle.astro';
+import Logo from './Logo.astro';
+
+const links = [
+  { label: 'About', href: '#about' },
+  { label: 'Work', href: '#work' },
+  { label: 'CV', href: '#cv' },
+  { label: 'Contact', href: '#contact' },
+];
+---
+
+<header class="nav" data-nav>
+  <a class="nav__brand" href="#top" data-cursor="Top" aria-label={`${profile.name} — home`}>
+    <Logo />
+  </a>
+
+  <nav class="nav__links" aria-label="Primary">
+    {
+      links.map((l) => (
+        <a class="nav__link" href={l.href} data-nav-link>
+          {l.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="nav__right">
+    {
+      profile.available && (
+        <span class="nav__pill">
+          <span class="nav__dot" /> Available for work
+        </span>
+      )
+    }
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: clamp(1rem, 2.5vw, 1.6rem) var(--pad);
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease),
+      padding 0.4s var(--ease);
+  }
+  /* Frosted glass once scrolled past the top (class toggled in main.js). */
+  .nav.is-scrolled {
+    background: color-mix(in srgb, var(--bg) 20%, #00000000);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom-color: var(--line);
+    padding-top: clamp(0.7rem, 1.6vw, 1rem);
+    padding-bottom: clamp(0.7rem, 1.6vw, 1rem);
+  }
+  /* On the glass, drop the difference blend and use theme-aware text. */
+  .nav.is-scrolled .nav__links,
+  .nav.is-scrolled .nav__right {
+    mix-blend-mode: normal;
+    color: var(--fg);
+  }
+  .nav.is-scrolled .nav__link,
+  .nav.is-scrolled .nav__pill {
+    color: var(--fg);
+  }
+  /* Blend mode lives on the text groups (so they auto-invert over any
+     background) but NOT the logo — the logo's accent underline needs its
+     true colour, like the hero. */
+  .nav__brand {
+    color: var(--fg);
+  }
+  .nav__links {
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 2.4rem);
+    mix-blend-mode: difference;
+  }
+  .nav__link {
+    position: relative;
+    font-size: var(--step--1);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--fg);
+  }
+  .nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s var(--ease);
+  }
+  .nav__link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .nav__right {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1.4rem);
+    mix-blend-mode: difference;
+  }
+  .nav__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--fg);
+  }
+  .nav__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 0 #22c55e;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    }
+    70% {
+      box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(216, 255, 62, 0);
+    }
+  }
+  @media (max-width: 720px) {
+    .nav__pill {
+      display: none;
+    }
+    .nav__links {
+      gap: 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+// Full-screen intro: counter ticks 0→100, then the panel wipes up
+// (driven from main.js) and hands off to the hero reveal.
+---
+
+<div class="preloader" data-preloader>
+  <div class="preloader__inner">
+    <span class="preloader__word" data-preload-word>Loading</span>
+    <span class="preloader__count" data-preload-count>0</span>
+  </div>
+  <div class="preloader__bar"><span data-preload-bar></span></div>
+</div>
+
+<style>
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--pad);
+    will-change: transform;
+  }
+  .preloader__inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .preloader__word {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: var(--step-1);
+    color: var(--fg-dim);
+  }
+  .preloader__count {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 0.8;
+    font-size: var(--step-huge);
+    color: var(--fg);
+  }
+  .preloader__bar {
+    margin-top: 1.5rem;
+    height: 2px;
+    width: 100%;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .preloader__bar span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+  }
+</style>

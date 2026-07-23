@@ -1,0 +1,303 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Logo from '../components/Logo.astro';
+import { profile, resume } from '../data/site.js';
+
+const telHref = `tel:${resume.contact.phone.replace(/\s+/g, '')}`;
+---
+
+<Layout title={`${resume.name} — Résumé`} description={resume.summary}>
+  <header class="res-head">
+    <a class="res-head__brand" href="/" data-cursor="Home" aria-label={`${profile.name} — home`}><Logo /></a>
+    <div class="res-head__right">
+      <a class="res-head__back" href="/#cv" data-cursor="Back">Back ↗</a>
+      <ThemeToggle />
+    </div>
+  </header>
+
+  <main class="resume">
+    <section class="resume__intro section">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal>{resume.greeting}</p>
+        <h1 class="display resume__name" data-reveal>{resume.name}</h1>
+        <p class="resume__roles" data-reveal>{resume.roles}</p>
+        <p class="resume__summary" data-reveal>{resume.summary}</p>
+      </div>
+    </section>
+
+    <section class="resume__body section">
+      <div class="wrap resume__grid">
+        <!-- Sidebar: expertise, tools, awards, education -->
+        <aside class="resume__col">
+          <h2 class="resume__col-title eyebrow" data-reveal>Expertise</h2>
+          <ul class="resume__tags" data-reveal>
+            {resume.expertise.map((e) => <li class="resume__tag">{e}</li>)}
+          </ul>
+
+          <h2 class="resume__col-title eyebrow resume__col-title--gap" data-reveal>Tools</h2>
+          <ul class="resume__tags" data-reveal>
+            {resume.tools.map((t) => <li class="resume__tag resume__tag--accent">{t}</li>)}
+          </ul>
+
+          <h2 class="resume__col-title eyebrow resume__col-title--gap" data-reveal>Awards</h2>
+          {
+            resume.awards.map((a) => (
+              <div class="resume__block" data-reveal>
+                <span class="resume__role">{a.title}</span>
+                <span class="resume__org accent">{a.org}</span>
+                <span class="resume__note">{a.note}</span>
+              </div>
+            ))
+          }
+
+          <h2 class="resume__col-title eyebrow resume__col-title--gap" data-reveal>Education</h2>
+          {
+            resume.education.map((ed) => (
+              <div class="resume__block" data-reveal>
+                <span class="resume__role">{ed.title}</span>
+                <span class="resume__org accent">{ed.org}</span>
+                <span class="resume__period">{ed.period}</span>
+              </div>
+            ))
+          }
+        </aside>
+
+        <!-- Main: work experience -->
+        <div class="resume__col resume__col--wide">
+          <h2 class="resume__col-title eyebrow" data-reveal>Work Experience</h2>
+          <ul class="resume__timeline">
+            {
+              resume.experience.map((e) => (
+                <li class="resume__item" data-reveal>
+                  <div class="resume__item-top">
+                    <span class="resume__role">
+                      {e.role}
+                      {e.subtitle && ` — ${e.subtitle}`}
+                    </span>
+                    <span class="resume__period">{e.period}</span>
+                  </div>
+                  <span class="resume__org accent">
+                    {e.org}
+                    {e.location && ` · ${e.location}`}
+                  </span>
+                  {e.bullets ? (
+                    <ul class="resume__bullets">
+                      {e.bullets.map((b) => (
+                        <li>
+                          <strong>{b.label}:</strong> {b.text}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p class="resume__note">{e.note}</p>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="resume__contact">
+      <div class="wrap resume__contact-grid">
+        <a class="resume__contact-item magnetic" href={resume.contact.portfolio.href} data-cursor="Visit">
+          <span class="resume__contact-label eyebrow">Portfolio</span>
+          <span class="resume__contact-value magnetic__inner">{resume.contact.portfolio.label}</span>
+        </a>
+        <a
+          class="resume__contact-item magnetic"
+          href={resume.contact.linkedin.href}
+          target="_blank"
+          rel="noopener"
+          data-cursor="Visit"
+        >
+          <span class="resume__contact-label eyebrow">LinkedIn</span>
+          <span class="resume__contact-value magnetic__inner">{resume.contact.linkedin.label}</span>
+        </a>
+        <a class="resume__contact-item magnetic" href={`mailto:${resume.contact.email}`} data-cursor="Email">
+          <span class="resume__contact-label eyebrow">Email</span>
+          <span class="resume__contact-value magnetic__inner">{resume.contact.email}</span>
+        </a>
+        <a class="resume__contact-item magnetic" href={telHref} data-cursor="Call">
+          <span class="resume__contact-label eyebrow">Phone</span>
+          <span class="resume__contact-value magnetic__inner">{resume.contact.phone}</span>
+        </a>
+        <div class="resume__contact-item">
+          <span class="resume__contact-label eyebrow">Location</span>
+          <span class="resume__contact-value">{resume.contact.location}</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  .res-head {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(1rem, 2.5vw, 1.6rem) var(--pad);
+    color: var(--fg);
+  }
+  .res-head__brand {
+    color: var(--fg);
+  }
+  .res-head__right {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1.4rem);
+    color: var(--fg);
+  }
+  .res-head__back {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .resume__intro {
+    padding-top: clamp(7rem, 16vh, 11rem);
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+  }
+  .resume__name {
+    font-size: var(--step-huge);
+    margin: 0.15em 0 0.3em;
+  }
+  .resume__roles {
+    font-size: var(--step-1);
+    color: var(--accent-ink);
+    margin-bottom: 1.5rem;
+  }
+  .resume__summary {
+    max-width: 68ch;
+    color: var(--fg-dim);
+    font-size: var(--step-0);
+    line-height: 1.6;
+  }
+
+  .resume__body {
+    padding-top: 0;
+  }
+  .resume__grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  .resume__col-title {
+    margin-bottom: 1.2rem;
+  }
+  .resume__col-title--gap {
+    margin-top: 2.5rem;
+  }
+
+  .resume__tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .resume__tag {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-size: var(--step--1);
+  }
+  .resume__tag--accent {
+    border-color: var(--accent-ink);
+    color: var(--accent-ink);
+  }
+
+  .resume__block {
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .resume__role {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    line-height: 1.15;
+  }
+  .resume__org {
+    font-size: var(--step-0);
+  }
+  .resume__period {
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+    white-space: nowrap;
+  }
+  .resume__note {
+    color: var(--fg-dim);
+    margin-top: 0.3rem;
+    max-width: 62ch;
+  }
+
+  .resume__timeline {
+    list-style: none;
+  }
+  .resume__item {
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .resume__item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .resume__bullets {
+    margin-top: 0.6rem;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    color: var(--fg-dim);
+    max-width: 66ch;
+  }
+  .resume__bullets li {
+    list-style: disc;
+  }
+  .resume__bullets strong {
+    color: var(--fg);
+  }
+
+  .resume__contact {
+    border-top: 1px solid var(--line);
+    padding: clamp(2rem, 6vh, 3.5rem) 0;
+  }
+  .resume__contact-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1.5rem, 5vw, 3.5rem);
+  }
+  .resume__contact-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .resume__contact-label {
+    font-size: var(--step--1);
+  }
+  .resume__contact-value {
+    font-size: var(--step-0);
+    color: var(--fg);
+  }
+  a.resume__contact-item:hover .resume__contact-value {
+    color: var(--accent-ink);
+  }
+
+  @media (max-width: 860px) {
+    .resume__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

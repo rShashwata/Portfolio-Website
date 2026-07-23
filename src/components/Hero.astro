@@ -1,0 +1,213 @@
+---
+import { profile } from '../data/site.js';
+const { roles } = profile;
+// Trailing duplicate of the first role makes the vertical rotation loop
+// seamlessly (it snaps back to 0 while showing an identical word).
+const rotatorWords = [...roles, roles[0]];
+---
+
+<section class="hero" id="top" data-hero>
+  <div class="hero__grid wrap">
+    <div class="hero__top">
+      <span class="display hero__name" data-split>{profile.name}</span>
+      <div class="hero__tag">
+        <p class="eyebrow" data-hero-fade>( {profile.title} )</p>
+        <!-- hand-drawn sparkle (his illustrator side); line-draws on load -->
+        <svg class="hero__star" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <path
+            data-draw
+            d="M50 4C55 34 66 45 96 50C66 55 55 66 50 96C45 66 34 55 4 50C34 45 45 34 50 4Z"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="hero__role">
+      <span class="hero__rotator">
+        <span class="hero__rotator-mask">
+          <span class="hero__rotator-list" data-rotator-list>
+            {rotatorWords.map((r) => <span class="hero__role-word">{r}</span>)}
+          </span>
+        </span>
+        <!-- hand-drawn underline that draws itself in -->
+        <svg class="hero__underline" viewBox="0 0 320 24" preserveAspectRatio="none" fill="none" aria-hidden="true">
+          <path
+            data-draw
+            d="M4 15C70 4 110 4 160 13C214 22 250 6 316 11"
+            stroke="currentColor"
+            stroke-width="4"
+            stroke-linecap="round"
+          ></path>
+        </svg>
+      </span>
+      <span class="visually-hidden">{profile.name} — {roles.join(', ')}</span>
+    </h1>
+
+    <div class="hero__foot">
+      <p class="hero__tagline" data-hero-fade>{profile.tagline}</p>
+      <p class="hero__loc eyebrow" data-hero-fade>{profile.location}</p>
+    </div>
+  </div>
+
+  <a class="hero__scroll" href="#work" data-hero-fade aria-label="Scroll to work">
+    <span>Scroll</span>
+    <svg width="14" height="40" viewBox="0 0 14 40" fill="none">
+      <path d="M7 0V38M7 38L1 32M7 38L13 32" stroke="currentColor" stroke-width="1.4"></path>
+    </svg>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 85svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(6rem, 13vh, 8rem) var(--pad) clamp(2rem, 5vh, 3.5rem);
+  }
+  .hero__grid {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 3vh, 2rem);
+  }
+  .hero__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1.5rem;
+  }
+  .hero__tag {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1.5rem);
+  }
+  .hero__star {
+    width: clamp(34px, 5vw, 60px);
+    height: clamp(34px, 5vw, 60px);
+    color: var(--accent-ink);
+    flex: none;
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Name is now a small wordmark, not the focal point — the rotating
+     craft below carries the hero so the work feels like the priority. */
+  .hero__name {
+    font-size: var(--step-1);
+    line-height: 1;
+  }
+
+  /* Rotating craft — slot-machine vertical scroll through the roles. */
+  .hero__role {
+    display: flex;
+    align-items: flex-end;
+  }
+  .hero__rotator {
+    position: relative;
+    display: inline-block;
+    /* Set the role font-size HERE so the mask's `em`-based height and the
+       underline's `em` offsets resolve against the same size as the words.
+       Custom clamp (bigger than the name, but small enough that the longest
+       role — "Design Consultant" — never overflows on a phone). */
+    font-size: clamp(1.6rem, 0.5rem + 5.5vw, 5.5rem);
+  }
+  .hero__rotator-mask {
+    display: block;
+    overflow: hidden;
+    height: 1.2em;
+    line-height: 1.2;
+  }
+  .hero__rotator-list {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+  }
+  .hero__role-word {
+    display: block;
+    height: 1.2em;
+    line-height: 1.2;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    font-size: 1em; /* inherit the rotator size set above */
+    color: var(--accent-ink);
+  }
+  .hero__underline {
+    position: absolute;
+    left: 0;
+    bottom: -0.18em;
+    width: 100%;
+    height: 0.32em;
+    color: var(--accent-ink);
+    overflow: visible;
+  }
+
+  .hero__foot {
+    margin-top: clamp(0.5rem, 3vh, 2rem);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    align-items: end;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: clamp(1rem, 3vh, 2rem);
+  }
+  .hero__tagline {
+    max-width: 42ch;
+    font-size: var(--step-1);
+    line-height: 1.2;
+  }
+  .hero__loc {
+    text-align: right;
+  }
+
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1.2rem, 4vh, 2.5rem);
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--step--1);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .hero__scroll svg {
+    animation: bob 1.8s var(--ease) infinite;
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(6px);
+    }
+  }
+  /* Bigger rotating craft on desktop (mobile keeps the safe clamp above so
+     the longest roles never overflow their nowrap line). */
+  @media (min-width: 1024px) {
+    .hero__rotator {
+      font-size: clamp(4.5rem, 7vw, 9rem);
+    }
+  }
+  @media (max-width: 720px) {
+    .hero__loc {
+      text-align: left;
+    }
+  }
+</style>

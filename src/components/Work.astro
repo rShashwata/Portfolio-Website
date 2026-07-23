@@ -1,0 +1,199 @@
+---
+import { projects, categories } from '../data/site.js';
+// "Recent" first, then the category tabs defined in site.js (Design leads).
+const tabs = [{ key: 'recent', label: 'Recent' }, ...categories];
+---
+
+<section class="work section" id="work" data-work>
+  <div class="wrap">
+    <div class="work__head">
+      <h2 class="display work__title" data-reveal>My Work</h2>
+      <p class="eyebrow" data-reveal>({String(projects.length).padStart(2, '0')}) Projects</p>
+    </div>
+
+    <div class="work__filters" data-reveal role="tablist" aria-label="Filter work by category">
+      {
+        tabs.map((t, i) => (
+          <button
+            class:list={['work__filter', { 'is-active': i === 0 }]}
+            data-filter={t.key}
+            type="button"
+          >
+            {t.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <ul class="work__list">
+      {
+        projects.map((p) => (
+          <li class="work__row" data-work-row data-accent={p.accent} data-cat={p.cat}>
+            <a class="work__link" href={`/work/${p.id}`} data-cursor="View">
+              <span class="work__id">{p.no}</span>
+              <span class="work__name display">{p.title}</span>
+              <span class="work__cat">{p.category}</span>
+              <span class="work__type">{p.type}</span>
+              <span class="work__year">{p.year}</span>
+            </a>
+            {/* Floating thumbnail that follows the cursor on hover.
+                Uses a generated gradient when `media` is null. */}
+            <div
+              class="work__thumb"
+              data-work-thumb
+              style={`--a:${p.accent}`}
+            >
+              {p.media ? (
+                <img src={p.media} alt={p.title} loading="lazy" />
+              ) : (
+                <span class="work__thumb-label">{p.title}</span>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .work {
+    background: var(--bg);
+  }
+  .work__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 6vh, 4rem);
+  }
+  .work__title {
+    font-size: var(--step-2);
+  }
+  .work__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+  .work__filter {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    transition: color 0.3s var(--ease), background 0.3s var(--ease),
+      border-color 0.3s var(--ease);
+  }
+  .work__filter:hover {
+    color: var(--fg);
+    border-color: var(--fg);
+  }
+  .work__filter.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+  .work__list {
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  /* Rows hidden by the active filter. */
+  .work__row[hidden] {
+    display: none;
+  }
+  .work__row {
+    position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+  .work__link {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    align-items: center;
+    gap: clamp(1rem, 4vw, 3rem);
+    padding: clamp(1.1rem, 3.5vw, 2.2rem) 0;
+    transition: padding-left 0.5s var(--ease), color 0.4s var(--ease);
+  }
+  .work__row:hover .work__link {
+    padding-left: clamp(1rem, 3vw, 2.5rem);
+  }
+  .work__id {
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+  }
+  .work__name {
+    font-size: clamp(1.8rem, 6.5vw, 5.5rem);
+    line-height: 1;
+    transition: color 0.4s var(--ease);
+  }
+  .work__row:hover .work__name {
+    color: var(--row-accent, var(--accent));
+  }
+  .work__cat,
+  .work__type,
+  .work__year {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    text-align: right;
+  }
+
+  /* floating thumbnail */
+  .work__thumb {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: clamp(180px, 22vw, 320px);
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    /* Above the nav (z-index 200) so the blend-mode brand text doesn't
+       bleed through the thumbnail when it floats near the top. */
+    z-index: 250;
+    transform: translate(-50%, -50%) scale(0.85);
+    will-change: transform, opacity;
+    background: radial-gradient(120% 120% at 20% 10%, var(--a), #000 90%);
+    display: grid;
+    place-items: center;
+  }
+  .work__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .work__thumb-label {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #000;
+    mix-blend-mode: overlay;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 720px) {
+    .work__link {
+      grid-template-columns: auto 1fr;
+      grid-auto-rows: auto;
+      gap: 0.3rem 1rem;
+      padding: 1.4rem 0;
+    }
+    .work__cat,
+    .work__type {
+      grid-column: 2;
+      text-align: left;
+    }
+    .work__year {
+      display: none;
+    }
+    /* On touch, show thumbs inline rather than cursor-following. */
+    .work__thumb {
+      display: none;
+    }
+  }
+</style>
