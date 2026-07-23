@@ -70,7 +70,7 @@ export const projects = [
     year: '2025',
     accent: '#8c00ff',
     media: '/img/case-studies/Banner-Top-5-scaled.webp',
-    client: 'Envoy Stratgy',
+    client: 'Envoy Strategy',
     role: 'Lead Designer',
     services: ['Brand Identity', 'Logo System', 'Guidelines', 'Motion'],
     description: [
