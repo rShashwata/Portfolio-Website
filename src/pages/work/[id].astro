@@ -116,13 +116,14 @@ const placeholders = [0, 1, 2, 3];
   .post-head__brand {
     color: var(--fg);
   }
-  /* Blend only the back link + toggle, so the logo keeps its true colours. */
+  /* Theme-aware so the back link + toggle stay legible in both modes (the
+     fixed header is its own stacking context, so mix-blend-mode can't blend
+     against the page behind it — a hardcoded white just vanished on light). */
   .post-head__right {
     display: flex;
     align-items: center;
     gap: clamp(0.8rem, 2vw, 1.4rem);
-    mix-blend-mode: difference;
-    color: #fff;
+    color: var(--fg);
   }
   .post-head__back {
     font-size: var(--step--1);
