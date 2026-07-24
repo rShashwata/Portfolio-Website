@@ -8,7 +8,6 @@ import Work from '../components/Work.astro';
 import About from '../components/About.astro';
 import Cv from '../components/Cv.astro';
 import Contact from '../components/Contact.astro';
-import { profile } from '../data/site.js';
 ---
 
 <Layout>
@@ -16,10 +15,9 @@ import { profile } from '../data/site.js';
   <Nav />
   <main>
     <Hero />
-    <Marquee items={profile.keywords} accent />
     <About />
-    <Marquee items={['Design', 'Edit', 'Motion', 'Color', 'Direct', 'Repeat']} reverse />
     <Work />
+    <Marquee items={['Design', 'Edit', 'Motion', 'Color', 'Direct', 'Repeat']} reverse />
     <Cv />
     <Contact />
   </main>

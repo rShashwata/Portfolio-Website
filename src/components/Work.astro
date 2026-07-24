@@ -8,7 +8,6 @@ const tabs = [{ key: 'recent', label: 'Recent' }, ...categories];
   <div class="wrap">
     <div class="work__head">
       <h2 class="display work__title" data-reveal>My Work</h2>
-      <p class="eyebrow" data-reveal>({String(projects.length).padStart(2, '0')}) Projects</p>
     </div>
 
     <div class="work__filters" data-reveal role="tablist" aria-label="Filter work by category">
@@ -95,6 +94,10 @@ const tabs = [{ key: 'recent', label: 'Recent' }, ...categories];
     background: var(--accent);
     border-color: var(--accent);
     color: #000;
+  }
+  /* Light mode: white label on the accent fill (reads better than black here). */
+  :global([data-theme='light']) .work__filter.is-active {
+    color: #fff;
   }
   .work__list {
     list-style: none;

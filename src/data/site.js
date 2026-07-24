@@ -10,12 +10,16 @@ export const profile = {
   // Positioning line (eyebrow + used in the <title>).
   title: 'Senior Design Consultant',
   // These cycle in the hero rotator. Keep them short, one craft each.
-  roles: ['Visual Designer', 'Illustrator', 'Video Editor', 'Motion Designer', 'Animator', 'Photographer'],
+  roles: ['Visual Designer', 'Illustrator', 'Video Editor', 'Motion Designer', 'Animator'],
   tagline:
     'Strategic, collaborative, relentlessly hands-on — I take ideas from brief to delivery and turn tight deadlines into standout outcomes.',
   location: 'Based in India — working worldwide',
   available: true, // toggles the "Available for work" pill
   email: 'rshashwata@hotmail.com',
+  phone: '+91 8527209805',
+  // B&W PNG cutout (transparent background) rendered as an interactive
+  // halftone portrait in the hero. Place the file in /public at this path.
+  photo: '/img/hero/portrait.png',
   // Used in the marquee strips. Add/remove freely.
   keywords: [
     'Graphic Design',
@@ -265,47 +269,56 @@ export const about = {
   stats: [
     { value: '5+', label: 'Years of experience' },
     { value: '4', label: 'Companies partnered with' },
-    { value: '2', label: 'Fine Arts degrees' },
-    { value: '1M+', label: 'Views on CEPA Council reels' },
+    { value: '1M+', label: 'Views on Insta reels' },
   ],
 };
 
 export const cv = {
-  // Where the "Download CV" / "View CV" button links to. Points at the
-  // full HTML resume page (src/pages/resume.astro) — see `resume` below
-  // for that page's content.
-  resumeUrl: '/resume',
+  // Where the "View CV" button links to. Points at the downloadable PDF
+  // résumé in /public — it opens in a new tab, so PDF-capable browsers
+  // preview it and the rest download it. (The HTML resume page at
+  // src/pages/resume.astro, built from `resume` below, is no longer linked
+  // from this button but still exists at /resume.)
+  resumeUrl: '/cv/Shashwata-Resume_2026.pdf',
   experience: [
     {
       role: 'Senior Design Consultant',
-      org: 'IndAus Advisors LLP | CEPA Council - UAE Embassy in India',
+      // This role spans two orgs; each segment links separately (from the PDF).
+      // Segments render joined by " | "; drop `url` on a part to leave it plain.
+      orgParts: [
+        { text: 'IndAus Advisors LLP', url: 'https://indausadvisory.com/' },
+        { text: 'UAE Embassy in India - CEPA Council', url: 'https://cepacouncil.com/' },
+      ],
       period: '2024 — 2026',
       note: 'Brand identity, event collateral and publication design for the UAE-India CEPA Council.',
     },
     {
       role: 'Graphic Designer',
       org: 'ARK Infosolutions Pvt. Ltd. - ICT360 Division',
+      url: 'https://www.arkinfo.in/',
       period: '2023 — 2024',
       note: 'Ed-tech creatives and 3D architectural visualizations for the iLab product line.',
     },
     {
       role: 'Graphic Designer',
       org: 'Timeus Interactive Services Pvt. Ltd.',
+      url: 'https://timeus.in/',
       period: '2022',
       note: 'Illustration, comic strips and 2D animation for enterprise clients like Dell and HCL.',
     },
     {
       role: 'Freelance Illustrator & Animator',
       org: 'Oasis Films & New Media',
+      url: 'https://ofnm.in/',
       period: '2020 — 2021',
       note: '2D animation and illustration for Government of India public sector campaigns.',
     },
   ],
   education: [
-    { title: 'Master of Fine Arts', org: 'College of Art, Delhi University', period: '2022' },
-    { title: 'Bachelor of Fine Arts', org: 'College of Art, Delhi University', period: '2020' },
+    { title: 'Master of Fine Arts', org: 'College of Art, Delhi University', url: 'https://colart.delhi.gov.in/', period: '2022' },
+    { title: 'Bachelor of Fine Arts', org: 'College of Art, Delhi University', url: 'https://colart.delhi.gov.in/', period: '2020' },
   ],
-  software: [
+  tools: [
     'Photoshop',
     'Illustrator',
     'Premiere Pro',
@@ -317,11 +330,10 @@ export const cv = {
   services: [
     'Graphic Design',
     'Illustration',
-    'Storyboarding',
     'Animation',
-    'Motion Graphics',
     'Video Editing',
-    'Content Writing',
+    'Motion Graphics',
+    'Storyboarding',
     'Research',
   ],
 };

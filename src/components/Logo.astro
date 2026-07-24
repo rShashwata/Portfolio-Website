@@ -27,7 +27,9 @@
     line-height: 0;
   }
   .logo__mark {
-    height: 2.1rem;
+    /* Match the theme-toggle button height (38px) so the two ends of the nav
+       line up; px (not rem) keeps them equal regardless of root font-size. */
+    height: 38px;
     width: auto;
     color: currentColor;
     filter: drop-shadow(0.4px 0.4px 0.5px rgba(0, 0, 0, 0.5));

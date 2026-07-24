@@ -99,6 +99,10 @@ const tabs = [{ key: 'all', label: 'All' }, ...categories];
     border-color: var(--accent);
     color: #000;
   }
+  /* Light mode: white label on the accent fill (reads better than black here). */
+  :global([data-theme='light']) .work__filter.is-active {
+    color: #fff;
+  }
 
   /* Asymmetric editorial grid: 12 columns, small auto-rows that cards span
      to get varied widths AND heights. `dense` keeps the packing tight when

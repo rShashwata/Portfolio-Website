@@ -6,7 +6,7 @@ import { cv } from '../data/site.js';
   <div class="wrap">
     <div class="cv__head">
       <h2 class="display cv__title" data-reveal>Curriculum<br />Vitae</h2>
-      <a class="cv__download magnetic" href={cv.resumeUrl} data-cursor="View">
+      <a class="cv__download magnetic" href={cv.resumeUrl} target="_blank" rel="noopener" data-cursor="View">
         <span class="magnetic__inner">View CV ↓</span>
       </a>
     </div>
@@ -23,7 +23,28 @@ import { cv } from '../data/site.js';
                   <span class="cv__role">{e.role}</span>
                   <span class="cv__period">{e.period}</span>
                 </div>
-                <span class="cv__org accent">{e.org}</span>
+                {e.orgParts ? (
+                  <span class="cv__org accent">
+                    {e.orgParts.map((p, i) => (
+                      <Fragment>
+                        {i > 0 ? ' | ' : ''}
+                        {p.url ? (
+                          <a class="cv__org-link" href={p.url} target="_blank" rel="noopener" data-cursor="Visit">
+                            {p.text}
+                          </a>
+                        ) : (
+                          p.text
+                        )}
+                      </Fragment>
+                    ))}
+                  </span>
+                ) : e.url ? (
+                  <a class="cv__org accent cv__org-link" href={e.url} target="_blank" rel="noopener" data-cursor="Visit">
+                    {e.org}
+                  </a>
+                ) : (
+                  <span class="cv__org accent">{e.org}</span>
+                )}
                 <p class="cv__note">{e.note}</p>
               </li>
             ))
@@ -38,15 +59,21 @@ import { cv } from '../data/site.js';
           cv.education.map((ed) => (
             <div class="cv__edu" data-reveal>
               <span class="cv__role">{ed.title}</span>
-              <span class="cv__org accent">{ed.org}</span>
+              {ed.url ? (
+                <a class="cv__org accent cv__org-link" href={ed.url} target="_blank" rel="noopener" data-cursor="Visit">
+                  {ed.org}
+                </a>
+              ) : (
+                <span class="cv__org accent">{ed.org}</span>
+              )}
               <span class="cv__period">{ed.period}</span>
             </div>
           ))
         }
 
-        <h3 class="cv__col-title eyebrow cv__col-title--gap" data-reveal>Software</h3>
+        <h3 class="cv__col-title eyebrow cv__col-title--gap" data-reveal>Tools</h3>
         <ul class="cv__tags" data-reveal>
-          {cv.software.map((s) => <li class="cv__tag">{s}</li>)}
+          {cv.tools.map((s) => <li class="cv__tag">{s}</li>)}
         </ul>
 
         <h3 class="cv__col-title eyebrow cv__col-title--gap" data-reveal>Services</h3>
@@ -131,6 +158,16 @@ import { cv } from '../data/site.js';
   }
   .cv__org {
     font-size: var(--step-0);
+  }
+  /* Org names that carry a `url` render as links; keep them inline-width so the
+     hover underline (and click target) hugs the text, not the whole row. */
+  .cv__org-link {
+    align-self: flex-start;
+    text-decoration: none;
+  }
+  .cv__org-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
   .cv__note {
     color: var(--fg-dim);

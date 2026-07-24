@@ -4,13 +4,28 @@ import { profile, socials } from '../data/site.js';
 
 <footer class="contact section" id="contact" data-contact>
   <div class="wrap">
-    <p class="eyebrow contact__label" data-reveal>(Contact)</p>
+    <div class="contact__headline">
+      <h2 class="display contact__big" data-reveal>Let's make<br />an Impact.</h2>
+      <!-- hand-drawn sparkle relocated from About; line-draws in + slowly spins -->
+      <svg class="contact__star" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <path
+          data-draw
+          d="M50 4C55 34 66 45 96 50C66 55 55 66 50 96C45 66 34 55 4 50C34 45 45 34 50 4Z"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+    </div>
 
-    <h2 class="display contact__big" data-reveal>Let's make<br />something loud.</h2>
-
-    <a class="contact__email magnetic" href={`mailto:${profile.email}`} data-cursor="Email">
-      <span class="magnetic__inner">{profile.email}</span>
-    </a>
+    <div class="contact__links">
+      <a class="contact__link magnetic" href={`mailto:${profile.email}`} data-cursor="Email">
+        <span class="magnetic__inner">{profile.email}</span>
+      </a>
+      <a class="contact__link magnetic" href={`tel:${profile.phone.replace(/\s+/g, '')}`} data-cursor="Call">
+        <span class="magnetic__inner">{profile.phone}</span>
+      </a>
+    </div>
 
     <div class="contact__socials">
       {
@@ -21,12 +36,6 @@ import { profile, socials } from '../data/site.js';
         ))
       }
     </div>
-
-    <div class="contact__base">
-      <span>© {new Date().getFullYear()} {profile.name}</span>
-      <span>{profile.location}</span>
-      <span>Built with Astro + GSAP</span>
-    </div>
   </div>
 </footer>
 
@@ -35,15 +44,49 @@ import { profile, socials } from '../data/site.js';
     background: var(--bg-soft);
     padding-bottom: clamp(2rem, 6vh, 4rem);
   }
-  .contact__label {
-    margin-bottom: clamp(1.5rem, 4vh, 3rem);
+  /* Wraps the headline so the sparkle can pin to its top-right corner. */
+  .contact__headline {
+    position: relative;
+    display: inline-block;
+    margin-bottom: clamp(2rem, 6vh, 4rem);
+  }
+  .contact__star {
+    position: absolute;
+    /* Phones: the headline fills the width, so there's no room beside it — the
+       sparkle sits just ABOVE its top-right corner, adjacent to the text. */
+    top: -88px;
+    right: 0;
+    width: clamp(72px, 9vw, 128px);
+    height: clamp(72px, 9vw, 128px);
+    color: var(--accent-ink);
+    animation: spin 14s linear infinite;
+    pointer-events: none;
+  }
+  /* Tablet and up: clear space opens beside the headline, so the sparkle moves
+     to the RIGHT of the "E" (adjacent, small gap) and drops down enough to clear
+     the fixed nav where the Contact section rests at the page bottom. */
+  @media (min-width: 768px) {
+    .contact__star {
+      top: -5px;
+      right: clamp(-148px, -10vw, -88px);
+    }
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
   .contact__big {
     font-size: var(--step-huge);
     line-height: 0.9;
-    margin-bottom: clamp(2rem, 6vh, 4rem);
   }
-  .contact__email {
+  .contact__links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(0.9rem, 2.5vh, 1.6rem);
+  }
+  .contact__link {
     display: inline-block;
     font-family: var(--font-display);
     font-weight: 500;
@@ -81,16 +124,5 @@ import { profile, socials } from '../data/site.js';
   .contact__social:hover::after {
     transform: scaleX(1);
     transform-origin: left;
-  }
-  .contact__base {
-    margin-top: clamp(3rem, 9vh, 6rem);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 2rem;
-    justify-content: space-between;
-    font-size: var(--step--1);
-    color: var(--fg-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
   }
 </style>

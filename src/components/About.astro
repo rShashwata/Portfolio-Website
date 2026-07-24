@@ -6,28 +6,32 @@ const words = about.statement.split(' ');
 
 <section class="about section" id="about" data-about>
   <div class="wrap">
-
-    <p class="about__statement display-soft" data-about-statement>
-      {
-        words.map((w) => (
-          <span class="about__word-wrap">
-            <span class="about__word" data-about-word>
-              {w}&nbsp;
+    <!-- Statement on the left; the figures sit in a card in the space to its right. -->
+    <div class="about__grid">
+      <p class="about__statement display-soft" data-about-statement>
+        {
+          words.map((w) => (
+            <span class="about__word-wrap">
+              <span class="about__word" data-about-word>
+                {w}&nbsp;
+              </span>
             </span>
-          </span>
-        ))
-      }
-    </p>
+          ))
+        }
+      </p>
 
-    <div class="about__stats">
-      {
-        about.stats.map((s) => (
-          <div class="about__stat" data-reveal>
-            <span class="about__stat-val display">{s.value}</span>
-            <span class="about__stat-label">{s.label}</span>
-          </div>
-        ))
-      }
+      <div class="about__card" data-reveal>
+        <div class="about__stats">
+          {
+            about.stats.map((s) => (
+              <div class="about__stat">
+                <span class="about__stat-val display">{s.value}</span>
+                <span class="about__stat-label">{s.label}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -39,6 +43,21 @@ const words = about.statement.split(' ');
   .about__label {
     margin-bottom: clamp(2rem, 5vh, 3.5rem);
   }
+
+  /* Statement (left) + figures card (right). Collapses to a single stacked
+     column below 900px. */
+  .about__grid {
+    display: grid;
+    gap: clamp(2rem, 4vw, 4.5rem);
+  }
+  @media (min-width: 900px) {
+    .about__grid {
+      grid-template-columns: 1fr clamp(320px, 34%, 440px);
+      /* Card hugs its content and sits flush with the top of the statement. */
+      align-items: start;
+    }
+  }
+
   .about__statement {
     font-family: var(--font-display);
     font-weight: 500;
@@ -46,7 +65,7 @@ const words = about.statement.split(' ');
     font-size: clamp(1.6rem, 1rem + 3.6vw, 4.2rem);
     line-height: 1.08;
     letter-spacing: -0.02em;
-    max-width: 22ch;
+    max-width: 28ch;
   }
   .about__word-wrap {
     display: inline-block;
@@ -57,33 +76,54 @@ const words = about.statement.split(' ');
     display: inline-block;
     will-change: transform;
   }
+
+  /* Card holding the figures — raised dark surface by default; a white,
+     soft-shadowed card in light mode (see the theme override below). */
+  .about__card {
+    display: flex;
+    /* Stretch to the full row height so the card's bottom aligns with the
+       bottom of the statement text (the taller column sets the row height). */
+    align-self: stretch;
+    background: #1b1b1b;
+    border: 1px solid var(--line);
+    border-radius: clamp(18px, 2vw, 28px);
+    padding: clamp(1.5rem, 2.4vw, 2.4rem);
+    box-shadow: 0 30px 60px -32px rgba(0, 0, 0, 0.65);
+  }
+  :global([data-theme='light']) .about__card {
+    background: #ffffff;
+    border-color: rgba(20, 19, 15, 0.05);
+    box-shadow:
+      0 30px 60px -24px rgba(20, 19, 15, 0.18),
+      0 8px 20px -12px rgba(20, 19, 15, 0.1);
+  }
+
+  /* Figures: a vertical ledger with hairline dividers between them. */
   .about__stats {
-    margin-top: clamp(3rem, 9vh, 6rem);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    border-top: 1px solid var(--line);
-    padding-top: clamp(1.5rem, 4vh, 3rem);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(1.2rem, 3vh, 2rem);
   }
   .about__stat {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.35rem;
+  }
+  .about__stat + .about__stat {
+    border-top: 1px solid var(--line);
+    padding-top: clamp(1.2rem, 3vh, 2rem);
   }
   .about__stat-val {
     font-size: var(--step-2);
     color: var(--accent-ink);
+    line-height: 1;
   }
   .about__stat-label {
     font-size: var(--step--1);
     color: var(--fg-dim);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-  }
-  @media (max-width: 720px) {
-    .about__stats {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem 1.5rem;
-    }
   }
 </style>

@@ -39,11 +39,11 @@
 [data-theme='light'] {
   color-scheme: light;
   --bg: #ffffff;
-  --bg-soft: #ffffff;
+  --bg-soft: #fffaf0e8;
   --fg: #14130f;
   --fg-dim: #6b6a60;
   --line: rgba(20, 19, 15, 0.16);
-  --accent: #cdf500; /* slightly deeper lime so the fill reads on cream */
+  --accent: #e23b13; /* slightly deeper lime so the fill reads on cream */
   --accent-ink: #e23b13; /* legible accent text on light */
 }
 
