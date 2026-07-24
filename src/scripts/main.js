@@ -261,6 +261,7 @@ function initHalftone() {
 
   const ctx = canvas.getContext('2d');
   const GAP = 5; // target dot pitch in CSS px — smaller = finer, more detailed matrix
+  const TOUCH_GAP = 3; // finer pitch on phones/tablets: the box caps at 320px there, so the desktop pitch reads coarse. The touch render is static (no pointer loop), so the extra dots cost nothing per frame.
   const REACH_FACTOR = 0.2; // repel radius as a fraction of the box's smaller side
   const PUSH_FACTOR = 0.18; // max dot displacement as a fraction of the repel radius — kept small for a loose, gentle nudge
   const FADE_START = 0.6; // fraction down the portrait where dots start fading out
@@ -364,12 +365,15 @@ function initHalftone() {
     boxW = rect.width;
     boxH = rect.height;
     if (!boxW || !boxH) return;
-    cols = Math.max(1, Math.round(boxW / GAP));
-    rows = Math.max(1, Math.round(boxH / GAP));
+    const gap = isTouch ? TOUCH_GAP : GAP;
+    cols = Math.max(1, Math.round(boxW / gap));
+    rows = Math.max(1, Math.round(boxH / gap));
     gapX = boxW / cols;
     gapY = boxH / rows;
     maxR = Math.min(gapX, gapY) * 0.6;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Allow the full pixel ratio (up to 3) on touch so the finer, smaller dots
+    // stay crisp on high-DPI phones; desktop stays capped at 2.
+    const dpr = Math.min(window.devicePixelRatio || 1, isTouch ? 3 : 2);
     canvas.width = boxW * dpr;
     canvas.height = boxH * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
