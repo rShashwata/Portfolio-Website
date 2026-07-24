@@ -331,6 +331,7 @@ export const cv = {
     'Graphic Design',
     'Illustration',
     'Animation',
+    'UX Design',
     'Video Editing',
     'Motion Graphics',
     'Storyboarding',
