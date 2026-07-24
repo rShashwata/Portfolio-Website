@@ -7,8 +7,6 @@
 
 export const profile = {
   name: 'SHASHWATA ROY',
-  // Positioning line (eyebrow + used in the <title>).
-  title: 'Senior Design Consultant',
   // These cycle in the hero rotator. Keep them short, one craft each.
   roles: ['Visual Designer', 'Illustrator', 'Video Editor', 'Motion Designer', 'Animator'],
   tagline:
