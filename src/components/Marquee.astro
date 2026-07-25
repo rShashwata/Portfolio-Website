@@ -1,6 +1,8 @@
 ---
-// Seamless scrolling strip. Renders the items twice so the GSAP loop
-// (in main.js) can translate by -50% forever without a visible seam.
+// Seamless scrolling strip. Renders the items twice as the no-JS baseline;
+// the GSAP loop (in main.js) measures the group against the viewport and
+// clones more copies if two can't cover a full cycle, then translates by one
+// group forever without a visible seam.
 // Scroll velocity also nudges its speed/direction for a kinetic feel.
 interface Props {
   items: string[];
@@ -8,7 +10,44 @@ interface Props {
   accent?: boolean;
 }
 const { items, reverse = false, accent = false } = Astro.props;
-const sep = '✦';
+
+// Rounded-square ring separator: an outer rounded rect with a smaller one
+// punched out by fill-rule="evenodd". Corners are drawn one at a time rather
+// than with a uniform radius, so each can be jittered independently — that
+// plus a hole that drifts slightly off-centre is what gives it the hand-cut
+// look of the reference instead of a mechanically perfect frame.
+const OUTER = 28; // half-size of the ring's outer box; fixed, so spacing stays even
+const HOLE = 12; // half-size of the hole
+const R_OUT = 16; // outer corner radius before jitter
+const R_IN = 7; // hole corner radius before jitter
+const WOBBLE = 0.16; // ± fraction a corner radius can vary by
+const DRIFT = 1.6; // how far off-centre the hole can sit
+
+const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
+const n = (v: number) => Math.round(v * 100) / 100;
+
+// Rounded rect, clockwise from the top-left corner, with a radius per corner
+// in TL/TR/BR/BL order.
+const roundRect = (x0: number, y0: number, x1: number, y1: number, r: number[]) =>
+  `M${n(x0 + r[0])} ${n(y0)}` +
+  `L${n(x1 - r[1])} ${n(y0)}A${n(r[1])} ${n(r[1])} 0 0 1 ${n(x1)} ${n(y0 + r[1])}` +
+  `L${n(x1)} ${n(y1 - r[2])}A${n(r[2])} ${n(r[2])} 0 0 1 ${n(x1 - r[2])} ${n(y1)}` +
+  `L${n(x0 + r[3])} ${n(y1)}A${n(r[3])} ${n(r[3])} 0 0 1 ${n(x0)} ${n(y1 - r[3])}` +
+  `L${n(x0)} ${n(y0 + r[0])}A${n(r[0])} ${n(r[0])} 0 0 1 ${n(x0 + r[0])} ${n(y0)}Z`;
+
+// One ring per item *position*, reused by every copy of the group — the copies
+// have to stay identical or the loop seam becomes visible once a cycle. Rolled
+// at build time, so it's stable across loads and needs no JS.
+const rings = items.map(() => {
+  const corners = (base: number) =>
+    Array.from({ length: 4 }, () => base * rand(1 - WOBBLE, 1 + WOBBLE));
+  const ox = rand(-DRIFT, DRIFT);
+  const oy = rand(-DRIFT, DRIFT);
+  return (
+    roundRect(32 - OUTER, 32 - OUTER, 32 + OUTER, 32 + OUTER, corners(R_OUT)) +
+    roundRect(32 + ox - HOLE, 32 + oy - HOLE, 32 + ox + HOLE, 32 + oy + HOLE, corners(R_IN))
+  );
+});
 ---
 
 <div class:list={['marquee', { 'marquee--accent': accent }]} data-marquee data-reverse={reverse ? 'true' : 'false'}>
@@ -16,10 +55,14 @@ const sep = '✦';
     {
       [0, 1].map(() => (
         <div class="marquee__group" aria-hidden="true">
-          {items.map((item) => (
+          {items.map((item, i) => (
             <span class="marquee__item">
               {item}
-              <span class="marquee__sep">{sep}</span>
+              <span class="marquee__sep">
+                <svg viewBox="0 0 64 64" fill="currentColor" fill-rule="evenodd">
+                  <path d={rings[i]} />
+                </svg>
+              </span>
             </span>
           ))}
         </div>
@@ -59,9 +102,18 @@ const sep = '✦';
     letter-spacing: -0.01em;
   }
   .marquee__sep {
+    display: flex;
     margin-inline: clamp(1rem, 3vw, 2.5rem);
     color: var(--accent-ink);
     font-size: 0.6em;
+  }
+  /* Sized in em off that 0.6em so it tracks the fluid item size, tuned to sit
+     at roughly the optical weight the ✦ glyph had. Width only — auto height
+     takes the ratio straight from the viewBox, so the shape can't stretch. */
+  .marquee__sep svg {
+    display: block;
+    width: 0.9em;
+    height: auto;
   }
   .marquee--accent .marquee__sep {
     color: #000;

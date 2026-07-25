@@ -462,26 +462,56 @@ function initRoleRotator() {
   const stepPct = 100 / total; // one word as a % of the list's height
 
   // The rotator box is as wide as its widest word, so a fixed-width underline
-  // overshoots shorter words. Measure each word's rendered text width and
-  // resize the underline to match, animating it in step with each rotation.
+  // overshoots shorter words. Measure each word's rendered text width (a Range
+  // over the text node, not the block, which would just give the box width)
+  // and resize the underline to match, animating it in step with each rotation.
   const underline = document.querySelector('.hero__underline');
   const textWidth = (el) => {
     const range = document.createRange();
     range.selectNodeContents(el);
     return range.getBoundingClientRect().width;
   };
-  const widths = words.map(textWidth);
-  if (underline) gsap.set(underline, { width: widths[0] });
+  // Those widths are pixels, so anything that changes the text's metrics after
+  // they're taken leaves the underline sized for the wrong word: the webfont
+  // swapping in over the fallback (the usual one — the role size is only
+  // measured once the preloader finishes, which on a cold cache beats the font
+  // there), or the vw-driven role size changing on resize or rotation. So
+  // re-measure and rebuild rather than baking the first reading in for good.
+  let tl = null;
+  let last = '';
+  const build = () => {
+    const widths = words.map(textWidth);
+    if (!widths[0]) return;
+    // Mobile browsers fire resize whenever the URL bar hides or shows; without
+    // this the rotation would reset its phase mid-scroll every time.
+    const key = widths.join();
+    if (key === last) return;
+    last = key;
 
-  gsap.set(list, { yPercent: 0 });
-  if (reduceMotion) return; // show the first role only
-  const tl = gsap.timeline({ repeat: -1 });
-  for (let i = 1; i <= real; i++) {
-    tl.to(list, { yPercent: -stepPct * i, duration: 0.6, ease: 'power3.inOut' }, '+=1.8');
-    if (underline) tl.to(underline, { width: widths[i], duration: 0.6, ease: 'power3.inOut' }, '<');
-  }
-  tl.set(list, { yPercent: 0 }); // snap back on the duplicate (visually identical)
-  if (underline) tl.set(underline, { width: widths[0] });
+    const progress = tl ? tl.progress() : 0;
+    tl?.kill();
+    tl = null;
+    gsap.set(list, { yPercent: 0 });
+    if (underline) gsap.set(underline, { width: widths[0] });
+    if (reduceMotion) return; // show the first role only
+
+    tl = gsap.timeline({ repeat: -1 });
+    for (let i = 1; i <= real; i++) {
+      tl.to(list, { yPercent: -stepPct * i, duration: 0.6, ease: 'power3.inOut' }, '+=1.8');
+      if (underline) tl.to(underline, { width: widths[i], duration: 0.6, ease: 'power3.inOut' }, '<');
+    }
+    tl.set(list, { yPercent: 0 }); // snap back on the duplicate (visually identical)
+    if (underline) tl.set(underline, { width: widths[0] });
+    tl.progress(progress); // resume where the old cycle was, not from the top
+  };
+
+  build();
+  document.fonts?.ready.then(build);
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(build, 200);
+  });
 }
 
 // ── Hand-drawn SVG marks: animate the stroke "drawing" itself in ─────────
@@ -585,19 +615,54 @@ function initMarquees() {
   const marquees = [];
   document.querySelectorAll('[data-marquee]').forEach((m) => {
     const track = m.querySelector('[data-marquee-track]');
-    if (!track) return;
+    const seed = track?.firstElementChild;
+    if (!seed) return;
     const reverse = m.getAttribute('data-reverse') === 'true';
-    const tween = gsap.fromTo(
-      track,
-      { xPercent: reverse ? -50 : 0 },
-      { xPercent: reverse ? 0 : -50, duration: 24, ease: 'none', repeat: -1 }
-    );
-    marquees.push({ track, tween });
+    const entry = { track };
+
+    // One cycle shifts the track left by exactly one group, so the groups
+    // still on screen when the cycle ends must span the container. With only
+    // the two copies Astro renders, a group narrower than the viewport runs
+    // out and bare track shows at the right. Clone the seed until (n - 1)
+    // groups cover the width, and shift by 100/n so the loop stays seamless.
+    let count = 0;
+    entry.build = () => {
+      const groupW = seed.getBoundingClientRect().width;
+      if (!groupW) return;
+      const need = Math.max(2, Math.ceil(m.clientWidth / groupW) + 1);
+      if (need === count) return;
+      count = need;
+      while (track.children.length > need) track.lastElementChild.remove();
+      while (track.children.length < need) track.appendChild(seed.cloneNode(true));
+      const shift = 100 / need;
+      const progress = entry.tween ? entry.tween.progress() : 0;
+      entry.tween?.kill();
+      entry.tween = gsap
+        .fromTo(
+          track,
+          { xPercent: reverse ? -shift : 0 },
+          { xPercent: reverse ? 0 : -shift, duration: 24, ease: 'none', repeat: -1 }
+        )
+        .progress(progress);
+      if (reduceMotion) entry.tween.pause();
+    };
+
+    entry.build();
+    // Webfonts landing late make the group wider than first measured, so
+    // re-run once they're ready.
+    document.fonts?.ready.then(entry.build);
+    marquees.push(entry);
   });
-  if (!marquees.length || reduceMotion) {
-    if (reduceMotion) marquees.forEach((m) => m.tween.pause());
-    return;
-  }
+  if (!marquees.length) return;
+
+  // The item font-size caps at 3rem, so past that width a wider viewport needs
+  // more copies to stay covered.
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => marquees.forEach((e) => e.build()), 200);
+  });
+  if (reduceMotion) return;
 
   // Feed Lenis velocity into the loop speed + a subtle skew.
   if (lenis) {
@@ -605,14 +670,14 @@ function initMarquees() {
       const v = clamp(velocity, -40, 40);
       const scale = 1 + Math.abs(v) * 0.08;
       marquees.forEach(({ track, tween }) => {
-        tween.timeScale(scale);
+        tween?.timeScale(scale); // absent until the group measures non-zero
         gsap.to(track, { skewX: clamp(-v * 0.4, -12, 12), duration: 0.4, overwrite: 'auto' });
       });
     });
     // Settle the skew when scrolling stops.
     ScrollTrigger.addEventListener('scrollEnd', () =>
       marquees.forEach(({ track, tween }) => {
-        tween.timeScale(1);
+        tween?.timeScale(1);
         gsap.to(track, { skewX: 0, duration: 0.5 });
       })
     );

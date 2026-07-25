@@ -66,7 +66,10 @@ const rotatorWords = [...roles, roles[0]];
   }
   .hero__grid {
     display: flex;
-    flex-direction: column;
+    /* Reversed so the portrait stacks ABOVE the name/role block. The DOM keeps
+       text first — that's the order it should be read and announced in — and
+       only the visual order flips. Overridden to `row` at 1200px. */
+    flex-direction: column-reverse;
     gap: clamp(1.5rem, 4vh, 3rem);
   }
   .hero__text {
@@ -81,8 +84,8 @@ const rotatorWords = [...roles, roles[0]];
     justify-content: space-between;
     gap: 0.6rem 1.5rem;
   }
-  /* Mobile: portrait sits in flow below the name/role block, centered. On
-     desktop (see the 1200px block) it joins a bottom-aligned row beside the
+  /* Stacked layout: portrait sits in flow above the name/role block, centered.
+     On desktop (see the 1200px block) it joins a bottom-aligned row beside the
      text. */
   .hero__portrait {
     width: min(68vw, 320px);
@@ -117,10 +120,32 @@ const rotatorWords = [...roles, roles[0]];
     font-size: clamp(1.6rem, 0.5rem + 5.5vw, 5.5rem);
   }
   .hero__rotator-mask {
+    /* The slot is one line tall plus a `--fade` band above and below, and a
+       gradient mask makes those bands transparent — so a word dissolves on
+       its way out instead of being sliced by a hard clip edge. The negative
+       margins pull that extra room back out of layout, so the box still
+       measures 1.2em and the underline / hero alignment are unchanged. */
+    --fade: 0.2em;
+    --slot: calc(1.2em + var(--fade) * 2);
     display: block;
     overflow: hidden;
-    height: 1.2em;
+    height: var(--slot);
+    margin-block: calc(var(--fade) * -1);
     line-height: 1.2;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 var(--fade),
+      #000 calc(100% - var(--fade)),
+      transparent
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 var(--fade),
+      #000 calc(100% - var(--fade)),
+      transparent
+    );
   }
   .hero__rotator-list {
     display: flex;
@@ -129,8 +154,11 @@ const rotatorWords = [...roles, roles[0]];
   }
   .hero__role-word {
     display: block;
-    height: 1.2em;
-    line-height: 1.2;
+    /* Must equal the mask slot so exactly one word shows at rest; the length
+       line-height centres the glyphs inside the taller slot, clear of both
+       fade bands. */
+    height: var(--slot);
+    line-height: var(--slot);
     white-space: nowrap;
     font-family: var(--font-display);
     font-weight: 700;
@@ -175,6 +203,30 @@ const rotatorWords = [...roles, roles[0]];
       transform: translateY(6px);
     }
   }
+  /* Stacked layout only: centre the name/role on the axis the portrait already
+     sits on. A max-width query rather than the file's usual mobile-first
+     min-width, because this is a self-contained override of the desktop row —
+     stated once here beats four undo rules in the 1200px block below.
+     The rotator box is as wide as its WIDEST role, so centring the block isn't
+     enough on its own: shorter roles have to centre inside that box too, and
+     the underline has to be pinned to the box's midpoint so the JS-animated
+     width grows outward from the centre instead of rightward from the edge. */
+  @media (max-width: 1199px) {
+    .hero__top {
+      justify-content: center;
+    }
+    .hero__role {
+      justify-content: center;
+    }
+    .hero__role-word {
+      text-align: center;
+    }
+    .hero__underline {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
   /* Bigger rotating craft on desktop (mobile keeps the safe clamp above so
      the longest roles never overflow their nowrap line). */
   @media (min-width: 1024px) {
