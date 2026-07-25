@@ -14,7 +14,7 @@ export const profile = {
   location: 'Based in India — working worldwide',
   available: true, // toggles the "Available for work" pill
   email: 'rshashwata@hotmail.com',
-  phone: '+91 8527209805',
+  phone: '+91 8178021263',
   // B&W PNG cutout (transparent background) rendered as an interactive
   // halftone portrait in the hero. Place the file in /public at this path.
   photo: '/img/hero/portrait.png',
