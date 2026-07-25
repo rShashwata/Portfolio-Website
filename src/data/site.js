@@ -418,7 +418,7 @@ export const resume = {
     portfolio: { label: 'www.shashwataroy.com', href: '/' },
     linkedin: { label: 'linkedin.com/in/roy-shashwata', href: 'https://www.linkedin.com/in/roy-shashwata' },
     email: 'rshashwata@hotmail.com',
-    phone: '+91 85272 09805',
+    phone: '+91 8178021263',
     location: 'Greater Noida',
   },
 };
