@@ -120,30 +120,34 @@ const rotatorWords = [...roles, roles[0]];
     font-size: clamp(1.6rem, 0.5rem + 5.5vw, 5.5rem);
   }
   .hero__rotator-mask {
-    /* The slot is one line tall plus a `--fade` band above and below, and a
-       gradient mask makes those bands transparent — so a word dissolves on
-       its way out instead of being sliced by a hard clip edge. The negative
-       margins pull that extra room back out of layout, so the box still
-       measures 1.2em and the underline / hero alignment are unchanged. */
-    --fade: 0.2em;
-    --slot: calc(1.2em + var(--fade) * 2);
+    /* Exactly one line tall. A gradient mask makes a band at each end
+       transparent, so a word dissolves on its way in and out instead of being
+       sliced by a hard clip edge.
+       The mask must NOT spill past this box: the underline sits immediately
+       below it, so anything painted down there shows up under the line as a
+       word rolls in. The bands don't need the extra room anyway — they only
+       have to stay off the resting word's ink, and the line box already leaves
+       empty space above the caps and below the baseline. Each band is sized to
+       that gap, which is why the lower one is the taller of the two (uppercase
+       leaves the whole descender clear). */
+    --fade-top: 0.2em;
+    --fade-bot: 0.22em;
     display: block;
     overflow: hidden;
-    height: var(--slot);
-    margin-block: calc(var(--fade) * -1);
+    height: 1.2em;
     line-height: 1.2;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent,
-      #000 var(--fade),
-      #000 calc(100% - var(--fade)),
+      #000 var(--fade-top),
+      #000 calc(100% - var(--fade-bot)),
       transparent
     );
     mask-image: linear-gradient(
       to bottom,
       transparent,
-      #000 var(--fade),
-      #000 calc(100% - var(--fade)),
+      #000 var(--fade-top),
+      #000 calc(100% - var(--fade-bot)),
       transparent
     );
   }
@@ -154,11 +158,9 @@ const rotatorWords = [...roles, roles[0]];
   }
   .hero__role-word {
     display: block;
-    /* Must equal the mask slot so exactly one word shows at rest; the length
-       line-height centres the glyphs inside the taller slot, clear of both
-       fade bands. */
-    height: var(--slot);
-    line-height: var(--slot);
+    /* Must equal the mask height so exactly one word shows at rest. */
+    height: 1.2em;
+    line-height: 1.2;
     white-space: nowrap;
     font-family: var(--font-display);
     font-weight: 700;
