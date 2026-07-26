@@ -5,6 +5,13 @@
 //  the components.
 // ───────────────────────────────────────────────────────────────────────────
 
+// Cloudflare R2 bucket for large videos and heavy documents. Small images stay
+// in /public (they ship with the build and need no extra request hop).
+// Referenced as `${R2}/…` below. If this ever moves to a custom domain, change
+// it here AND in the CSP in public/_headers — the CSP names the host exactly,
+// so a mismatch means assets silently fail to load.
+export const R2 = 'https://pub-574039bbb93247d39bad622ae03f49f9.r2.dev';
+
 export const profile = {
   name: 'SHASHWATA ROY',
   // These cycle in the hero rotator. Keep them short, one craft each.
@@ -54,12 +61,50 @@ export const categories = [
 //      `type`        → small sub-label (e.g. 'Design · Motion')
 //      `year`        → year string
 //      `accent`      → hex colour used for the hover tint / placeholder
-//      `media`       → big hero image, e.g. '/work/neon.jpg' (put files in /public). null = placeholder
+//      `media`       → big hero image. null = placeholder.
+//                      Keep project files in /public/img/work/<id>/ so each case
+//                      study owns one folder, e.g. '/img/work/neon-pulse/hero.jpg'
 //      `client`,`role` → shown in the case-study meta
 //      `services`    → array of tags, e.g. ['Editing', 'Color']
 //      `description` → array of paragraphs (the "Overview" text)
-//      `gallery`     → array of image paths for the case-study gallery,
-//                      e.g. ['/work/neon-1.jpg', '/work/neon-2.jpg']. Omit/[] = placeholders.
+//      `gallery`     → array of case-study gallery items. Omit/[] = placeholders.
+//                      Four item shapes are supported:
+//
+//                      1. IMAGE — a plain string. Local path or any https URL,
+//                         so an R2 image needs no object wrapper:
+//                           '/img/work/neon-pulse/01.jpg'
+//                           `${R2}/work/neon-pulse/wide-shot.jpg`
+//
+//                      2. YOUTUBE
+//                           { type: 'youtube', id: 'dQw4w9WgXcQ' }              → 16:9
+//                           { type: 'youtube', id: '...', vertical: true }      → 9:16
+//                         `id` is the bit after ?v= in the watch URL (or the
+//                         last path segment of a /shorts/ URL). `vertical: true`
+//                         for Shorts/Reels, so the player gets a 9:16 box
+//                         instead of being pillarboxed into 16:9.
+//
+//                      3. VIDEO — self-hosted .mp4 (R2). `poster` is optional
+//                         but worth setting on big files: without it the browser
+//                         shows an empty black box until metadata arrives.
+//                           { type: 'video', src: `${R2}/work/reel.mp4`,
+//                             poster: '/img/work/neon-pulse/reel-poster.jpg' }
+//                           { type: 'video', src: `${R2}/work/short.mp4`,
+//                             vertical: true }
+//
+//                      4. PDF — embedded document (R2 or local).
+//                           { type: 'pdf', src: `${R2}/docs/case-study.pdf` }
+//
+//                      Layout: the first item spans full width. Any 16:9 player
+//                      (YouTube or video) takes its own full-width row; vertical
+//                      ones sit in a single column at a capped height; PDFs get a
+//                      full-width, height-capped frame.
+//
+//    HEADS UP: the CSP in public/_headers allows remote assets from an explicit
+//    list of hosts only — currently the R2 bucket, startupseries.ae (images) and
+//    youtube-nocookie.com (embeds). Pointing any item at a NEW host means adding
+//    it to the matching directive there (img-src / media-src / frame-src) or the
+//    browser blocks it. Local files under /public always work.
+//    Filenames in /public must be lowercase-with-dashes + ASCII.
 export const projects = [
   // ── DESIGNING (priority) ────────────────────────────────────────────────
   {
@@ -71,7 +116,7 @@ export const projects = [
     type: 'Design · Motion',
     year: '2025',
     accent: '#8c00ff',
-    media: '/img/case-studies/Banner-Top-5-scaled.webp',
+    media: '/img/work/uae-india-start-up-series/banner-top-5-scaled.webp',
     client: 'Envoy Strategy',
     role: 'Lead Designer',
     services: ['Brand Identity', 'Logo System', 'Guidelines', 'Motion'],
@@ -79,12 +124,16 @@ export const projects = [
       'A complete identity for a boutique architecture studio — built around a flexible monogram and a warm, editorial type system.',
       'The system stretches from business cards to large-format signage and an animated logo reveal used across their launch film.',
     ],
-    // Example: drop image files in /public and list them here. First image
-    // spans full width. Remove or leave empty to keep placeholder tiles.
-    gallery: ['/img/case-studies/UICC-Start-up-Series-Pitch-Event-37.jpg',
-      '/img/case-studies/UICC-Start-up-Series-Pitch-Event-9.jpg',
+    // Example: drop image files in /public/img/work/<id>/ and list them here.
+    // First item spans full width. Remove or leave empty for placeholder tiles.
+    // A YouTube embed can go anywhere in this list:
+    //   { type: 'youtube', id: 'dQw4w9WgXcQ' },                 // 16:9
+    //   { type: 'youtube', id: 'dQw4w9WgXcQ', vertical: true }, // 9:16 Short
+    gallery: [
+      '/img/work/uae-india-start-up-series/uicc-start-up-series-pitch-event-37.jpg',
+      '/img/work/uae-india-start-up-series/uicc-start-up-series-pitch-event-9.jpg',
       'https://startupseries.ae/wp-content/uploads/2019/07/Web-Banner-4.png',
-      '/img/case-studies/MoU-UAE-India-Business-Council-2-1.jpg'
+      '/img/work/uae-india-start-up-series/mou-uae-india-business-council-2-1.jpg',
     ],
   },
   {
@@ -277,7 +326,7 @@ export const cv = {
   // preview it and the rest download it. (The HTML resume page at
   // src/pages/resume.astro, built from `resume` below, is no longer linked
   // from this button but still exists at /resume.)
-  resumeUrl: '/cv/Shashwata-Resume_2026.pdf',
+  resumeUrl: '/cv/shashwata-resume-2026.pdf',
   experience: [
     {
       role: 'Senior Design Consultant',

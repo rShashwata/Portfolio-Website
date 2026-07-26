@@ -13,10 +13,29 @@ export function getStaticPaths() {
 }
 
 const { project, next } = Astro.props;
-// Real case-study images if the project provides a `gallery` array,
-// otherwise fall back to 4 placeholder tiles.
-const galleryImages =
+// Real case-study media if the project provides a `gallery` array, otherwise
+// fall back to 4 placeholder tiles. An item is either a plain string (image
+// path or external URL) or an object with a `type` — see site.js for the
+// full list. One loose shape rather than a union: site.js is plain JS, so
+// `type` widens to string and a discriminated union won't narrow from it.
+type MediaItem = {
+  type: string;
+  id?: string;
+  src?: string;
+  poster?: string;
+  vertical?: boolean;
+};
+type GalleryItem = string | MediaItem;
+const galleryItems: GalleryItem[] | null =
   Array.isArray(project.gallery) && project.gallery.length ? project.gallery : null;
+const isMedia = (item: GalleryItem): item is MediaItem =>
+  typeof item === 'object' && item !== null;
+// 'image' | 'youtube' | 'video' | 'pdf'
+const kindOf = (item: GalleryItem) => (isMedia(item) ? item.type : 'image');
+// Players (YouTube or self-hosted) are 16:9 unless flagged vertical (9:16).
+const isPlayer = (item: GalleryItem) =>
+  kindOf(item) === 'youtube' || kindOf(item) === 'video';
+const isVertical = (item: GalleryItem) => isMedia(item) && item.vertical === true;
 const placeholders = [0, 1, 2, 3];
 ---
 
@@ -75,10 +94,51 @@ const placeholders = [0, 1, 2, 3];
         <p class="eyebrow" data-reveal>Gallery</p>
         <div class="post__grid">
           {
-            galleryImages
-              ? galleryImages.map((src, i) => (
-                  <figure class:list={['post__tile', { 'post__tile--wide': i === 0 }]} data-reveal>
-                    <img src={src} alt={`${project.title} — image ${i + 1}`} loading="lazy" />
+            galleryItems
+              ? galleryItems.map((item, i) => (
+                  <figure
+                    class:list={[
+                      'post__tile',
+                      {
+                        // Exactly one layout treatment per item, so the
+                        // modifiers never compete on specificity.
+                        'post__tile--wide': i === 0 && kindOf(item) === 'image',
+                        'post__tile--video': isPlayer(item) && !isVertical(item),
+                        'post__tile--video-portrait': isPlayer(item) && isVertical(item),
+                        'post__tile--doc': kindOf(item) === 'pdf',
+                      },
+                    ]}
+                    data-reveal
+                  >
+                    {!isMedia(item) ? (
+                      <img src={item} alt={`${project.title} — image ${i + 1}`} loading="lazy" />
+                    ) : item.type === 'youtube' ? (
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${item.id}`}
+                        title={`${project.title} — video ${i + 1}`}
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                      />
+                    ) : item.type === 'video' ? (
+                      // Self-hosted (R2). No autoplay: playback stays user-initiated,
+                      // which also keeps it clear of prefers-reduced-motion.
+                      <video
+                        src={item.src}
+                        poster={item.poster}
+                        controls
+                        preload="metadata"
+                        playsinline
+                        aria-label={`${project.title} — video ${i + 1}`}
+                      />
+                    ) : item.type === 'pdf' ? (
+                      <iframe
+                        src={item.src}
+                        title={`${project.title} — document ${i + 1}`}
+                        loading="lazy"
+                      />
+                    ) : null}
                   </figure>
                 ))
               : placeholders.map((g) => (
@@ -220,6 +280,54 @@ const placeholders = [0, 1, 2, 3];
   .post__tile--wide {
     grid-column: 1 / -1;
     aspect-ratio: 21 / 9;
+  }
+  .post__tile :is(iframe, video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  /* contain, so a clip whose ratio doesn't match the tile is letterboxed
+     rather than cropped */
+  .post__tile video {
+    object-fit: contain;
+    background: #000;
+  }
+  /* Landscape video: always its own full-width row at the player's native
+     16:9. Full-width because a 16:9 tile beside a 4:3 image leaves an uneven
+     row. Full opacity because a dimmed player reads as disabled. */
+  .post__tile--video {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+    opacity: 1;
+  }
+  /* Vertical video (Shorts/Reels): stays in one column, but the height is
+     capped — an unconstrained 9:16 tile at column width computes taller than
+     the viewport. The player is centred at its native ratio, tile background
+     showing either side. */
+  .post__tile--video-portrait {
+    --portrait-h: min(78vh, 700px);
+    aspect-ratio: auto;
+    height: var(--portrait-h);
+    display: grid;
+    place-items: center;
+    opacity: 1;
+  }
+  /* Both dimensions are stated explicitly rather than left to `width: auto` +
+     `aspect-ratio`, which resolved against the column width (not the capped
+     height) on wide viewports and overflowed the tile. `min(100%, …)` keeps
+     the player inside the column when 9:16 of the height is wider than it. */
+  .post__tile--video-portrait :is(iframe, video) {
+    height: 100%;
+    width: min(100%, calc(var(--portrait-h) * 9 / 16));
+  }
+  /* PDF: full-width so it is actually readable, height-capped so it doesn't
+     run past the viewport. */
+  .post__tile--doc {
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    height: min(85vh, 900px);
+    opacity: 1;
   }
 
   .post__next {
