@@ -39,23 +39,11 @@ const {
 
     <!-- Add the `js` class as early as possible so the no-JS fallback
          (visible content) only gets hidden when JS is actually running.
-         Also resolve the theme before paint to avoid a flash. -->
-    <script is:inline>
-      document.documentElement.classList.add('js');
-      (function () {
-        try {
-          var t = localStorage.getItem('theme');
-          if (t !== 'light' && t !== 'dark') {
-            t = window.matchMedia('(prefers-color-scheme: light)').matches
-              ? 'light'
-              : 'dark';
-          }
-          document.documentElement.dataset.theme = t;
-        } catch (e) {
-          document.documentElement.dataset.theme = 'dark';
-        }
-      })();
-    </script>
+         Also resolve the theme before paint to avoid a flash.
+         Plain external script (no type=module/defer/async) so it still
+         runs synchronously before first paint, and stays CSP-compliant
+         without 'unsafe-inline' on script-src. -->
+    <script is:inline src="/theme-init.js"></script>
   </head>
   <body>
     <!-- Custom cursor (hidden on touch devices via CSS) -->
