@@ -23,6 +23,16 @@
     padding: var(--pad);
     will-change: transform;
   }
+  /* Set before paint by /theme-init.js when the visitor has already seen the
+     loading screen this session — hidden outright so it never flashes. */
+  html[data-preload='skip'] .preloader {
+    display: none;
+  }
+  /* Without JS nothing ever animates it away, so it would cover the page
+     forever. The `js` class is added in /theme-init.js. */
+  html:not(.js) .preloader {
+    display: none;
+  }
   .preloader__inner {
     display: flex;
     align-items: flex-end;

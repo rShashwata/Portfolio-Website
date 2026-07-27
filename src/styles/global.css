@@ -185,6 +185,14 @@ html.js [data-reveal] {
   transform: translate(-50%, -50%);
   mix-blend-mode: difference;
   will-change: transform;
+  /* Hidden until main.js knows where the pointer is. Otherwise every page
+     load paints it at 0,0 (top-left) and it flies to the cursor on the first
+     mouse move. `data-cursor-ready` is set as soon as a position is known —
+     restored from the previous page, or on the first pointermove. */
+  opacity: 0;
+}
+html[data-cursor-ready] .cursor {
+  opacity: 1;
 }
 .cursor__label {
   position: fixed;
@@ -204,16 +212,25 @@ html.js [data-reveal] {
   white-space: nowrap;
   will-change: transform;
 }
+/* Set before paint in /theme-init.js when the URL carries a fragment. The
+   browser paints the top of the page before jumping to the target, which
+   flashes the hero on the way to #work; this holds the first paint until
+   main.js has scrolled into position. Always cleared — by main.js, or by the
+   1s fallback timer in theme-init.js if the bundle never runs. */
+html[data-jump] body {
+  visibility: hidden;
+}
+
 /* The dot + label ARE the pointer, so hide the OS one — otherwise the arrow /
    hand is drawn on top of the centred label pill and covers the text.
    (initCursor already scales the dot to 0 while a label is showing.)
    Gated on .js so a no-JS visitor — where the dot never moves — keeps a real
    cursor, and on fine pointers so a mouse on a hybrid device is unaffected. */
 @media (hover: hover) and (pointer: fine) {
-  html.js,
-  html.js *,
-  html.js a,
-  html.js button {
+  html.js[data-cursor-ready],
+  html.js[data-cursor-ready] *,
+  html.js[data-cursor-ready] a,
+  html.js[data-cursor-ready] button {
     cursor: none;
   }
 }

@@ -411,7 +411,8 @@ export const cv = {
     'After Effects',
     'Figma',
     'Claude Code',
-    'MS Office Suite',
+    'Word',
+    'PowerPoint'
   ],
   services: [
     'Graphic Design',

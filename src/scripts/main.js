@@ -183,13 +183,52 @@ function initCursor() {
     applyState(el);
   };
 
+  // A page navigation recreates the dot at 0,0 while the physical pointer
+  // hasn't moved at all — it sat in the top-left and flew across on the next
+  // mouse move. clientX/Y stay valid across a navigation (same screen, same
+  // pointer), so restore the last known position and prime quickTo's start
+  // value so nothing tweens in from the corner. Until a position is known the
+  // dot stays hidden and the OS cursor is left visible (see global.css), so
+  // there's never a moment with no pointer on screen.
+  const place = (x, y) => {
+    px = x;
+    py = y;
+    xDot(x, x);
+    yDot(y, y);
+    xLab(x, x);
+    yLab(y, y);
+    document.documentElement.setAttribute('data-cursor-ready', '');
+  };
+  try {
+    const saved = sessionStorage.getItem('cursorPos');
+    if (saved) {
+      const [sx, sy] = saved.split(',').map(Number);
+      if (Number.isFinite(sx) && Number.isFinite(sy)) place(sx, sy);
+    }
+  } catch (e) {
+    /* storage blocked — the dot just appears on first move instead */
+  }
+
   window.addEventListener('pointermove', (e) => {
+    if (px === null) {
+      place(e.clientX, e.clientY); // first move of the session: snap, don't tween
+      return;
+    }
     px = e.clientX;
     py = e.clientY;
     xDot(px);
     yDot(py);
     xLab(px);
     yLab(py);
+  });
+
+  // One write per navigation rather than one per mouse move.
+  window.addEventListener('pagehide', () => {
+    try {
+      if (px !== null) sessionStorage.setItem('cursorPos', px + ',' + py);
+    } catch (e) {
+      /* storage blocked — nothing to restore next page */
+    }
   });
 
   document.querySelectorAll(TARGETS).forEach((el) => {
@@ -721,10 +760,23 @@ function runPreloader() {
     ScrollTrigger.refresh();
   };
 
-  if (!pre || reduceMotion) {
+  // `data-preload="skip"` is set before paint in /theme-init.js when this
+  // session has already seen the loading screen (i.e. we got here from an
+  // internal link rather than a fresh load or a refresh).
+  const skip = document.documentElement.dataset.preload === 'skip';
+
+  if (!pre || reduceMotion || skip) {
     if (pre) pre.style.display = 'none';
     start();
     return;
+  }
+
+  // Only mark it as seen once it genuinely plays, so a visitor who lands on a
+  // case study first still gets it when they reach the home page.
+  try {
+    sessionStorage.setItem('preloaded', '1');
+  } catch (e) {
+    /* storage blocked — it just plays every time */
   }
 
   const counter = { v: 0 };
@@ -744,9 +796,33 @@ function runPreloader() {
     .set(pre, { display: 'none' });
 }
 
+// ── Fragment landing: jump before the page is revealed ───────────────────
+// theme-init.js hides <body> when the URL has a fragment, because the browser
+// paints the top of the page before resolving the target. Position the page
+// here, then release it, so the hero is never seen on the way to #work.
+function settleHashJump() {
+  const html = document.documentElement;
+  if (!html.dataset.jump) return;
+  try {
+    const target = document.querySelector(window.location.hash);
+    if (target) {
+      const y = Math.round(target.getBoundingClientRect().top + window.scrollY);
+      window.scrollTo(0, y);
+      // Lenis caches its own scroll value on init; without this it eases back.
+      if (lenis) lenis.scrollTo(y, { immediate: true });
+    }
+  } catch (e) {
+    /* hash isn't a valid selector — just reveal the page as-is */
+  }
+  delete html.dataset.jump;
+}
+
 // ── Boot ─────────────────────────────────────────────────────────────────
 function init() {
   initSmoothScroll();
+  // Straight after Lenis exists (it owns the scroll position) and before the
+  // filters change the page height.
+  settleHashJump();
   initScrolledNav();
   initTheme();
   initCursor();
