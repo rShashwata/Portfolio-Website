@@ -8,7 +8,7 @@ const telHref = `tel:${resume.contact.phone.replace(/\s+/g, '')}`;
 ---
 
 <Layout title={`${resume.name} — Résumé`} description={resume.summary}>
-  <header class="res-head">
+  <header class="res-head" data-nav>
     <a class="res-head__brand" href="/" data-cursor="Home" aria-label={`${profile.name} — home`}><Logo /></a>
     <div class="res-head__right">
       <a class="res-head__back" href="/#cv" data-cursor="Back">Back ↗</a>
@@ -145,6 +145,18 @@ const telHref = `tel:${resume.contact.phone.replace(/\s+/g, '')}`;
     justify-content: space-between;
     padding: clamp(1rem, 2.5vw, 1.6rem) var(--pad);
     color: var(--fg);
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease),
+      padding 0.4s var(--ease);
+  }
+  /* Same frosted treatment as the home/gallery nav (class toggled in main.js). */
+  .res-head.is-scrolled {
+    background: color-mix(in srgb, var(--bg) 20%, #00000000);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom-color: var(--line);
+    padding-top: clamp(0.7rem, 1.6vw, 1rem);
+    padding-bottom: clamp(0.7rem, 1.6vw, 1rem);
   }
   .res-head__brand {
     color: var(--fg);

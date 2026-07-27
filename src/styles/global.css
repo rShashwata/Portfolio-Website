@@ -204,6 +204,19 @@ html.js [data-reveal] {
   white-space: nowrap;
   will-change: transform;
 }
+/* The dot + label ARE the pointer, so hide the OS one — otherwise the arrow /
+   hand is drawn on top of the centred label pill and covers the text.
+   (initCursor already scales the dot to 0 while a label is showing.)
+   Gated on .js so a no-JS visitor — where the dot never moves — keeps a real
+   cursor, and on fine pointers so a mouse on a hybrid device is unaffected. */
+@media (hover: hover) and (pointer: fine) {
+  html.js,
+  html.js *,
+  html.js a,
+  html.js button {
+    cursor: none;
+  }
+}
 @media (hover: none), (pointer: coarse) {
   .cursor,
   .cursor__label {

@@ -158,27 +158,29 @@ function initCursor() {
   let py = null;
   let hovered = null;
 
-  // Labelled targets show a pill; plain links/buttons just enlarge the dot.
-  const enter = (el) => {
-    hovered = el;
-    const text = el.getAttribute('data-cursor');
+  const TARGETS = '[data-cursor], a, button';
+
+  // Labelled targets show a pill; plain links/buttons just enlarge the dot;
+  // nothing hovered resets both. Written as one function of the current
+  // target — never as separate enter/leave side effects — because fast moves
+  // and scroll-driven boundary crossings deliver enter(new) BEFORE leave(old).
+  // The old code hid the pill only in leave(), and skipped it whenever
+  // `hovered` had already moved on, which orphaned the pill on screen.
+  const applyState = (el) => {
+    const text = el?.getAttribute('data-cursor');
     if (text) {
       label.textContent = text;
-      gsap.to(label, { scale: 1, duration: 0.3, ease: 'power3' });
-      gsap.to(dot, { scale: 0, duration: 0.2 });
+      gsap.to(label, { scale: 1, duration: 0.3, ease: 'power3', overwrite: 'auto' });
+      gsap.to(dot, { scale: 0, duration: 0.2, overwrite: 'auto' });
     } else {
-      gsap.to(dot, { scale: 2.6, duration: 0.25 });
+      gsap.to(label, { scale: 0, duration: 0.25, ease: 'power3', overwrite: 'auto' });
+      gsap.to(dot, { scale: el ? 2.6 : 1, duration: 0.25, overwrite: 'auto' });
     }
   };
-  const leave = (el) => {
-    if (hovered !== el) return;
-    hovered = null;
-    if (el.getAttribute('data-cursor')) {
-      gsap.to(label, { scale: 0, duration: 0.25, ease: 'power3' });
-      gsap.to(dot, { scale: 1, duration: 0.2 });
-    } else {
-      gsap.to(dot, { scale: 1, duration: 0.25 });
-    }
+  const setHovered = (el) => {
+    if (el === hovered) return;
+    hovered = el;
+    applyState(el);
   };
 
   window.addEventListener('pointermove', (e) => {
@@ -190,25 +192,22 @@ function initCursor() {
     yLab(py);
   });
 
-  document
-    .querySelectorAll('[data-cursor], a:not([data-cursor]), button:not([data-cursor])')
-    .forEach((el) => {
-      el.addEventListener('pointerenter', () => enter(el));
-      el.addEventListener('pointerleave', () => leave(el));
-    });
+  document.querySelectorAll(TARGETS).forEach((el) => {
+    el.addEventListener('pointerenter', () => setHovered(el));
+    // Don't trust which element fired — by the next frame any follow-up
+    // pointermove has landed, so just re-read what's under the pointer.
+    el.addEventListener('pointerleave', () => requestAnimationFrame(recheckHover));
+  });
 
   // Smooth scroll (Lenis) can carry a target out from under a stationary
   // pointer without ever firing pointerenter/pointerleave — those only
   // respond to actual pointer movement, not content moving underneath it —
   // which left the pill/enlarged dot stuck. Re-hit-test the last known
   // pointer position on every scroll tick and correct the state if it drifted.
-  const recheckHover = () => {
+  function recheckHover() {
     if (px === null) return;
-    const el = document.elementFromPoint(px, py)?.closest('[data-cursor], a, button');
-    if (el === hovered) return;
-    if (hovered) leave(hovered);
-    if (el) enter(el);
-  };
+    setHovered(document.elementFromPoint(px, py)?.closest(TARGETS) || null);
+  }
   if (lenis) lenis.on('scroll', recheckHover);
   else window.addEventListener('scroll', recheckHover, { passive: true });
 }

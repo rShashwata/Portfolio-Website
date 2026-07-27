@@ -6,8 +6,19 @@ import { cv } from '../data/site.js';
   <div class="wrap">
     <div class="cv__head">
       <h2 class="display cv__title" data-reveal>Curriculum<br />Vitae</h2>
-      <a class="cv__download magnetic" href={cv.resumeUrl} target="_blank" rel="noopener" data-cursor="View">
-        <span class="magnetic__inner">View CV ↓</span>
+      {/* `download` forces a save instead of handing the file to the browser's
+          PDF viewer — Chrome on Android renders it inline with no obvious way
+          out. Works because the file is same-origin (/public); target/rel stay
+          as the fallback for anything that ignores the attribute. */}
+      <a
+        class="cv__download magnetic"
+        href={cv.resumeUrl}
+        download
+        target="_blank"
+        rel="noopener"
+        data-cursor="Download"
+      >
+        <span class="magnetic__inner">Download CV ↓</span>
       </a>
     </div>
 

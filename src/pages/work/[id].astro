@@ -53,7 +53,7 @@ const placeholders = [0, 1, 2, 3];
 ---
 
 <Layout title={`${project.title} — ${profile.name}`} description={project.description[0]}>
-  <header class="post-head">
+  <header class="post-head" data-nav>
     <a class="post-head__brand" href="/" data-cursor="Home" aria-label={`${profile.name} — home`}><Logo /></a>
     <div class="post-head__right">
       <a class="post-head__back" href="/#work" data-cursor="Index">Index ↗</a>
@@ -206,6 +206,19 @@ const placeholders = [0, 1, 2, 3];
     justify-content: space-between;
     padding: clamp(1rem, 2.5vw, 1.6rem) var(--pad);
     color: var(--fg);
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease),
+      padding 0.4s var(--ease);
+  }
+  /* Same frosted treatment as the home/gallery nav (class toggled in main.js),
+     so the bar reads identically on every page once scrolled. */
+  .post-head.is-scrolled {
+    background: color-mix(in srgb, var(--bg) 20%, #00000000);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom-color: var(--line);
+    padding-top: clamp(0.7rem, 1.6vw, 1rem);
+    padding-bottom: clamp(0.7rem, 1.6vw, 1rem);
   }
   .post-head__brand {
     color: var(--fg);
