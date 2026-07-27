@@ -176,8 +176,12 @@ html.js [data-reveal] {
   position: fixed;
   top: 0;
   left: 0;
-  width: 14px;
-  height: 14px;
+  /* Laid out at the LARGEST size it is ever drawn, then scaled down by
+     main.js (DOT_REST / DOT_HOVER). The browser rasterises the layer once at
+     this size, so enlarging on hover samples down from it instead of
+     magnifying a 14px raster — which is what made the big state look blurry. */
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--accent);
   pointer-events: none;

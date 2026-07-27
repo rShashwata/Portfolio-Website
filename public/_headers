@@ -1,5 +1,10 @@
+# PRE-LAUNCH: the X-Robots-Tag line below keeps the site out of search results
+# for any crawler that ignores robots.txt but honours noindex; `nofollow` also
+# tells it not to follow (or attribute) links out of these pages. REMOVE THAT
+# LINE AT LAUNCH, together with public/robots.txt. Leave every other header.
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Robots-Tag: noindex, nofollow
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY

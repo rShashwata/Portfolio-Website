@@ -142,12 +142,97 @@ function initFilters() {
   applyFilter(initial.getAttribute('data-filter'), false);
 }
 
+// ── Case-study hero: match the meta rule to the title's first line ───────
+//  A wrapped line's width isn't expressible in CSS, so measure it. A Range
+//  over the heading returns one rect per rendered line — the first is the one
+//  the rule aligns to. Same technique as the hero underline in
+//  initRoleRotator, and re-run for the same reasons: the width is in pixels,
+//  so it goes stale when the webfont swaps in or the vw-driven size changes.
+function initHeroRule() {
+  const title = document.querySelector('[data-hero-rule-from]');
+  const rule = document.querySelector('[data-hero-rule]');
+  if (!title || !rule) return;
+
+  const measure = () => {
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    const firstLine = range.getClientRects()[0];
+    // No rects while the element is display:none or the text hasn't laid out;
+    // leaving --rule-w unset keeps the CSS fallback rather than collapsing it.
+    if (!firstLine || !firstLine.width) return;
+    rule.style.setProperty('--rule-w', Math.round(firstLine.width) + 'px');
+  };
+
+  measure();
+  document.fonts?.ready.then(measure);
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(measure, 200);
+  });
+}
+
+// ── Tabbed panels on the bespoke UISS case study ─────────────────────────
+//  Lives here rather than in a <script> on the page: a small page-level module
+//  gets inlined into the HTML at build time, and the CSP in public/_headers
+//  sets `script-src 'self'` with no unsafe-inline, so it would be blocked.
+//  Bails on any page without the hooks.
+function initUissTabs() {
+  const tabs = Array.from(document.querySelectorAll('[data-uiss-tab]'));
+  const panels = Array.from(document.querySelectorAll('[data-uiss-panel]'));
+  if (!tabs.length || !panels.length) return;
+
+  const select = (key, focus = false) => {
+    tabs.forEach((tab) => {
+      const on = tab.getAttribute('data-uiss-tab') === key;
+      tab.classList.toggle('is-active', on);
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      // Roving tabindex: the whole tablist is one tab stop, arrows move within.
+      tab.tabIndex = on ? 0 : -1;
+      if (on && focus) tab.focus();
+    });
+    panels.forEach((panel) =>
+      panel.classList.toggle('is-active', panel.getAttribute('data-uiss-panel') === key)
+    );
+    // Panels differ in height, so switching changes the page height — anything
+    // below them has stale trigger positions until this runs.
+    ScrollTrigger.refresh();
+  };
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(tab.getAttribute('data-uiss-tab')));
+    tab.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      select(tabs[(i + step + tabs.length) % tabs.length].getAttribute('data-uiss-tab'), true);
+    });
+  });
+
+  // Boot from whichever tab is active in the markup, so the initial state is
+  // declared in one place (the page) rather than twice.
+  const initial = tabs.find((t) => t.classList.contains('is-active')) || tabs[0];
+  select(initial.getAttribute('data-uiss-tab'));
+}
+
 // ── Custom cursor: a dot that trails the pointer + a contextual label ────
 function initCursor() {
   if (isTouch) return;
   const dot = document.querySelector('.cursor');
   const label = document.querySelector('.cursor__label');
   if (!dot || !label) return;
+
+  // The dot is laid out at 40px (see global.css) and scaled DOWN, so the
+  // enlarged state never magnifies a small raster. Set explicitly here because
+  // the resting state is otherwise never applied until the first hover change.
+  const DOT_REST = 0.35; // 14px — the dot's normal size
+  const DOT_HOVER = 0.9; // 36px — the enlargement over a plain link or button
+  // xPercent/yPercent restate the CSS `translate(-50%, -50%)` as GSAP owns it:
+  // quickTo writes x/y outright, so the centring must not depend on how the
+  // pre-existing transform was parsed. At 40px a lost offset would throw the
+  // dot 20px off the pointer. Harmless if GSAP already read it from the CSS.
+  gsap.set(dot, { scale: DOT_REST, xPercent: -50, yPercent: -50 });
+  gsap.set(label, { xPercent: -50, yPercent: -50 });
 
   const xDot = gsap.quickTo(dot, 'x', { duration: 0.15, ease: 'power3' });
   const yDot = gsap.quickTo(dot, 'y', { duration: 0.15, ease: 'power3' });
@@ -174,7 +259,7 @@ function initCursor() {
       gsap.to(dot, { scale: 0, duration: 0.2, overwrite: 'auto' });
     } else {
       gsap.to(label, { scale: 0, duration: 0.25, ease: 'power3', overwrite: 'auto' });
-      gsap.to(dot, { scale: el ? 2.6 : 1, duration: 0.25, overwrite: 'auto' });
+      gsap.to(dot, { scale: el ? DOT_HOVER : DOT_REST, duration: 0.25, overwrite: 'auto' });
     }
   };
   const setHovered = (el) => {
@@ -828,6 +913,8 @@ function init() {
   initCursor();
   initMagnetic();
   initFilters();
+  initHeroRule();
+  initUissTabs();
   runPreloader();
 }
 

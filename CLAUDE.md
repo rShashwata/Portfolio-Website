@@ -35,7 +35,9 @@ Imported once at the bottom of [src/layouts/Layout.astro](src/layouts/Layout.ast
 
 **Styling** is global CSS in [src/styles/global.css](src/styles/global.css) plus scoped `<style>` blocks in components. Reuse the CSS custom properties instead of hardcoding: fluid type scale (`--step--1`, `--step-0`, `--step-2`, `--step-huge`), spacing (`--pad`), fonts (`--font-display`), theme colors (`--fg`, `--bg`, `--line`), and the per-project accent (`--a`).
 
-**Before deploying:** set the real origin in `astro.config.mjs` (`site:`, currently `https://example.com`) — it feeds canonical/OG meta.
+**Before deploying:** set the real origin in `astro.config.mjs` (`site:`) — it feeds canonical/OG meta.
+
+**At launch:** the site is deliberately hidden from search engines while it's being built. Two things must be removed together or it stays invisible to Google: `public/robots.txt` (`Disallow: /`) and the `X-Robots-Tag: noindex, nofollow` line in `public/_headers`. Both files carry the reminder inline.
 
 ---
 

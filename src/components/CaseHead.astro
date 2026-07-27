@@ -1,0 +1,62 @@
+---
+// Fixed header shared by every case-study page — the templated ones from
+// work/[id].astro and the bespoke ones. Lives in its own component so the two
+// can't drift apart: `data-nav` is what main.js watches to add the frosted
+// treatment once scrolled.
+import ThemeToggle from './ThemeToggle.astro';
+import Logo from './Logo.astro';
+import { profile } from '../data/site.js';
+---
+
+<header class="post-head" data-nav>
+  <a class="post-head__brand" href="/" data-cursor="Home" aria-label={`${profile.name} — home`}><Logo /></a>
+  <div class="post-head__right">
+    <a class="post-head__back" href="/#work" data-cursor="Index">Index ↗</a>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .post-head {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(1rem, 2.5vw, 1.6rem) var(--pad);
+    color: var(--fg);
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease),
+      padding 0.4s var(--ease);
+  }
+  /* Same frosted treatment as the home/gallery nav (class toggled in main.js),
+     so the bar reads identically on every page once scrolled. */
+  .post-head.is-scrolled {
+    background: color-mix(in srgb, var(--bg) 20%, #00000000);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom-color: var(--line);
+    padding-top: clamp(0.7rem, 1.6vw, 1rem);
+    padding-bottom: clamp(0.7rem, 1.6vw, 1rem);
+  }
+  .post-head__brand {
+    color: var(--fg);
+  }
+  /* Theme-aware so the back link + toggle stay legible in both modes (the
+     fixed header is its own stacking context, so mix-blend-mode can't blend
+     against the page behind it — a hardcoded white just vanished on light). */
+  .post-head__right {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1.4rem);
+    color: var(--fg);
+  }
+  .post-head__back {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+</style>

@@ -1,0 +1,22 @@
+# ───────────────────────────────────────────────────────────────────────────
+#  PRE-LAUNCH — REMOVE THIS FILE (or flip to the block at the bottom) BEFORE
+#  GOING LIVE. While it says `Disallow: /`, the ENTIRE portfolio is invisible
+#  to Google. Nothing gets crawled, nothing gets indexed, and no outbound link
+#  from any page is discovered — which is the point: a crawler that never
+#  fetches a page can never record who that page links to, so the UISS 2.0
+#  link cannot surface in anyone else's backlink reports.
+#
+#  Note this is the reason there is no `noindex` meta tag as well: a blocked
+#  crawler never fetches the page, so it would never read the tag. Blocking the
+#  crawl is the stronger of the two. The X-Robots-Tag header in public/_headers
+#  covers crawlers that ignore this file but honour noindex.
+# ───────────────────────────────────────────────────────────────────────────
+User-agent: *
+Disallow: /
+
+# ── AT LAUNCH, replace everything above with: ──────────────────────────────
+# User-agent: *
+# Allow: /
+# Sitemap: https://www.shashwataroy.com/sitemap-index.xml
+#   (the sitemap line only applies if @astrojs/sitemap is added later — the
+#    build has no integrations today, so drop it unless that changes.)

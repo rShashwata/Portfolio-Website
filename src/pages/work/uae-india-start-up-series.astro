@@ -1,0 +1,1408 @@
+---
+// ───────────────────────────────────────────────────────────────────────────
+//  BESPOKE CASE STUDY — UAE-India Start-Up Series
+//  Hand-built page, deliberately NOT rendered by work/[id].astro. That
+//  template skips this slug (see its `bespoke` list) so only this file owns
+//  the URL. The project still lives in site.js: it drives the home-page row,
+//  the gallery card and the "next project" chain, and the hero meta below is
+//  read from it rather than duplicated here.
+//
+//  ALL PLACEHOLDER COPY IS MARKED  <<PLACEHOLDER>>  — swap it for the real
+//  write-up. Asset slots with `src: null` render an accent tile, so nothing
+//  breaks while files are still missing.
+//
+//  The tab behaviour is `initUissTabs()` in src/scripts/main.js, keyed off the
+//  data-uiss-tab / data-uiss-panel hooks below. It deliberately does NOT live
+//  in a <script> on this page: Astro inlines a small page module straight into
+//  the HTML, and the CSP in public/_headers sets `script-src 'self'` with no
+//  unsafe-inline — the browser would block it and the tabs would do nothing.
+// ───────────────────────────────────────────────────────────────────────────
+import Layout from '../../layouts/Layout.astro';
+import CaseHead from '../../components/CaseHead.astro';
+import { projects, profile, R2 } from '../../data/site.js';
+
+// Every slot is declared nullable so a missing asset renders a placeholder
+// instead of a broken tag, and so the arrays below stay one uniform shape.
+type Shot = { src: string | null; caption: string };
+type Reel = { src: string | null; poster: string | null; label: string; meta: string };
+// A UX block renders any combination of these — prose, an arrow list, a card
+// grid and a row of image slots — in that order, so every key is optional.
+type UxBlock = {
+  title: string;
+  body?: string[];
+  list?: string[];
+  cards?: { label: string; text: string }[];
+  media?: Shot[];
+};
+
+const ID = 'uae-india-start-up-series';
+const index = projects.findIndex((p) => p.id === ID);
+const project = projects[index];
+const next = projects[(index + 1) % projects.length];
+
+// ── EDIT BELOW ────────────────────────────────────────────────────────────
+
+// Anchor image for the UISS 1.0 section — the tab bar sits on its bottom edge.
+const baseImage = '/img/work/uae-india-start-up-series/uicc-start-up-series-pitch-event-37.jpg';
+
+// Page-level lede. <<PLACEHOLDER>>
+const lede = [
+  'The UAE-India Start-Up Series is the flagship cross-border start-up platform run under the CEPA framework — a pitch stage where founders from both markets meet investors, regulators and embassy leadership in the same room.',
+  'I owned the visual system end to end across two editions: the launch identity and event branding for UISS 1.0, the promotional film and social campaign that carried it, and the interface design for the platform that followed.',
+];
+
+// TAB 1 — Event Branding. `src: null` → placeholder tile.
+const brandingShots: Shot[] = [
+  {
+    src: '/img/work/uae-india-start-up-series/uicc-start-up-series-pitch-event-9.jpg',
+    caption: 'Pitch-day stage backdrop and speaker frame', // <<PLACEHOLDER>>
+  },
+  {
+    src: '/img/work/uae-india-start-up-series/mou-uae-india-business-council-2-1.jpg',
+    caption: 'MoU signing set — podium, step-and-repeat, delegate signage', // <<PLACEHOLDER>>
+  },
+  {
+    src: 'https://startupseries.ae/wp-content/uploads/2019/07/Web-Banner-4.png',
+    caption: 'Web banner system rolled out across the live UISS site', // <<PLACEHOLDER>>
+  },
+  {
+    // Drop a file in /public/img/work/uae-india-start-up-series/ and point at it.
+    src: null,
+    caption: 'Delegate kit — badges, agenda booklet, print collateral', // <<PLACEHOLDER>>
+  },
+];
+
+// TAB 3 — Promotional Content. Self-hosted vertical (9:16) clips on R2.
+// Upload the file, then set `src` to its URL — e.g.
+//   src: 'https://media.shashwataroy.com/work/uae-india-start-up-series/reel-01.mp4'
+// (or `import { R2 } from '../../data/site.js'` and write `${R2}/…`). That host
+// is already allowed by media-src in public/_headers, so no CSP change needed.
+// `poster` is optional but worth setting on big files: without one the browser
+// shows a black box until metadata arrives.
+const reels: Reel[] = [
+  {
+    src: null,
+    poster: null,
+    label: 'Launch film — UISS 1.0', // <<PLACEHOLDER>>
+    meta: '1.4M views · Instagram Reels', // <<PLACEHOLDER>>
+  },
+  {
+    src: null,
+    poster: null,
+    label: 'Pitch-day recap', // <<PLACEHOLDER>>
+    meta: '620K views · Instagram Reels', // <<PLACEHOLDER>>
+  },
+];
+
+// ── TAB 2 — UI Design ─────────────────────────────────────────────────────
+//  Structured as a standard UX case study. Every image slot below is `src:
+//  null` for now and renders a labelled placeholder at the right aspect ratio,
+//  so the layout is already correct — dropping a screenshot in is a one-line
+//  change per slot. Keep screens in /public/img/work/uae-india-start-up-series/.
+
+// Lead screen, shown full width at 16:9. <<PLACEHOLDER>>
+const uiLeadScreen: Shot = {
+  src: null,
+  caption: 'Programme landing page — desktop',
+};
+
+// Supporting screens, shown as a row of phone-ratio (9:16) slots.
+// <<PLACEHOLDER>>
+const uiScreens: Shot[] = [
+  { src: null, caption: 'Application — eligibility step' },
+  { src: null, caption: 'Application — team and deck upload' },
+  { src: null, caption: 'Panel shortlist — live scoring' },
+];
+
+// Pull quote: the framework's "bold statement that outlines your research
+// conclusion". `lead` renders in the accent colour. <<PLACEHOLDER>>
+const uiStatement = {
+  lead: 'Founders were not abandoning the form because it was long.',
+  rest: 'They abandoned it because they could not see what would be asked next — so the flow was rebuilt around showing the shape of the whole application up front.',
+};
+
+const uxBlocks: UxBlock[] = [
+  {
+    title: 'Project Summary',
+    body: [
+      'A responsive web platform for the Start-Up Series: a public-facing programme page, a founder application flow and an internal shortlist view used by the selection panel during pitch week.',
+      'Designed in Figma as a desktop-first system with a mobile breakpoint, handed to the development vendor as annotated screens plus a component sheet.',
+    ],
+    media: [
+      { src: null, caption: 'Sitemap and screen inventory' }, // <<PLACEHOLDER>>
+      { src: null, caption: 'Low-fidelity wireframes' }, // <<PLACEHOLDER>>
+    ],
+  },
+  {
+    title: 'Goals',
+    cards: [
+      {
+        label: 'One sitting, one phone',
+        text: 'Application completable end to end on a phone, without a login or a desktop.',
+      },
+      {
+        label: 'One screen for the panel',
+        text: 'Rank, filter and score applicants live, during the pitch session rather than after it.',
+      },
+      {
+        label: 'Official, not start-up-y',
+        text: 'Carry the UISS event identity on screen without losing the institutional tone the Embassy requires.',
+      },
+    ],
+  },
+  {
+    title: 'Business Impact',
+    cards: [
+      {
+        label: 'Applications collected',
+        text: '<<PLACEHOLDER — real number>> in the first cycle, replacing a mailbox-and-spreadsheet process.',
+      },
+      {
+        label: 'Review time halved',
+        text: '<<PLACEHOLDER>> Panel review per applicant, against the previous PDF-circulation method.',
+      },
+      {
+        label: 'Reused every edition',
+        text: 'One template the Council now runs each cycle instead of rebuilding per event.',
+      },
+    ],
+  },
+  {
+    title: 'Research & Approach',
+    body: [
+      'No budget or calendar for formal user research, so the inputs were what already existed: the previous cycle’s application emails, the secretariat’s own shortlisting spreadsheet, and two walkthroughs with the officers who process submissions.',
+      'That surfaced the real bottleneck — founders were sending incomplete decks and staff were chasing them by email — so the flow was built around progressive disclosure and inline validation rather than a longer form.',
+      'Reference set was other government-adjacent start-up programmes rather than consumer SaaS: the design had to read as official, not as a launch landing page.',
+    ],
+    media: [
+      { src: null, caption: 'Journey map — founder application path' }, // <<PLACEHOLDER>>
+      { src: null, caption: 'Competitor audit — programme sites' }, // <<PLACEHOLDER>>
+    ],
+  },
+  {
+    title: 'Technical Limitations',
+    body: [
+      'Lack of context. I joined after the platform’s scope was already committed and had no access to analytics, no prior user data and no direct line to founders who had applied before. Decisions had to be made from proxy evidence and staff interviews, which is a real limitation on how confidently the flow can be claimed to be optimal.',
+      'Time crunch. The screens were needed inside the launch window, in parallel with the event collateral for the same programme. Usability testing was cut, and the design was locked at one round of internal review with a shared component library constraining what could be specified.',
+    ],
+  },
+  {
+    title: 'Next Steps',
+    list: [
+      'Instrument the application flow and measure drop-off per step — the first cycle shipped without analytics.',
+      'Moderated testing with five founders from the applicant pool to validate the disclosure order.',
+      'An accessibility pass against WCAG AA, focusing on form errors and keyboard order in the panel view.',
+      'Extend the component sheet into a documented kit so future editions do not need a designer to launch.',
+    ],
+  },
+];
+
+// UISS 2.0 — live site. The link's rel does three separate jobs:
+//   noopener   — the new tab can't reach back into this one (standard).
+//   noreferrer — suppresses the Referer header, so a click lands in their
+//                analytics as direct traffic with no mention of this domain.
+//   nofollow   — asks crawlers not to follow or attribute the link. Google has
+//                treated it as a hint rather than a rule since 2019, so it
+//                reduces rather than guarantees; the real pre-launch cover is
+//                public/robots.txt, which stops the page being crawled at all.
+const liveUrl = 'https://startupseries.ae';
+const uiss2 = {
+  eyebrow: 'Phase 02',
+  title: 'UISS 2.0',
+  // <<PLACEHOLDER>>
+  body: [
+    'The second edition rebuilt the identity for a larger programme: a wider colour system, a refreshed logotype lockup and a full web presence rather than a single event page.',
+    'The platform is live — the branding, layout and asset system below are in production use.',
+  ],
+};
+
+// ── Brand guidelines PDF (R2) ─────────────────────────────────────────────
+//  One URL drives both the button and the inline embed. Placeholder filename —
+//  upload the file and correct it here.
+const guidelinesPdf = `${R2}/uae-india-start-up-series-brand-guidelines.pdf`;
+
+//  HEADS UP before flipping this to `true`: an R2-hosted PDF will NOT render in
+//  a frame while media.shashwataroy.com returns `X-Frame-Options: SAMEORIGIN`
+//  (a Cloudflare zone-level security-headers transform). That header comes from
+//  the file's own host, so no CSP change here overrides it — it has to be lifted
+//  for that hostname in Cloudflare first. iOS Safari refuses framed PDFs
+//  regardless, which is why the layout below falls back to a link card on small
+//  screens. While this is `false` the section shows that card everywhere, so
+//  the guidelines are always reachable — just not embedded.
+const guidelinesEmbed = false;
+
+// <<PLACEHOLDER>>
+const guidelinesNote = [
+  'Before handing the programme over, I documented the whole system as a brand rulebook: logo construction and clear space, the extended colour palette, type hierarchy, photography direction, and templates for event, print and social assets.',
+  'It exists so the identity survives without me — anyone running a future edition can produce on-brand collateral without redrawing the system from scratch.',
+];
+
+const tabs = [
+  { key: 'branding', label: 'Event Branding' },
+  { key: 'ui', label: 'UI Design' },
+  { key: 'content', label: 'Promotional Content' },
+];
+
+const metaDescription =
+  'Brand identity, event collateral, promotional film and platform UI for the UAE-India Start-Up Series, across both editions of the programme.';
+---
+
+<Layout title={`${project.title} — ${profile.name}`} description={metaDescription}>
+  <CaseHead />
+
+  <main class="uiss" style={`--a:${project.accent}`}>
+    <!-- ── Hero: full-bleed cover, meta overlaid ───────────────────────── -->
+    <section class="hero-uiss">
+      {
+        project.media ? (
+          <img class="hero-uiss__img" src={project.media} alt="" fetchpriority="high" />
+        ) : null
+      }
+      <div class="hero-uiss__inner">
+        <div class="wrap">
+          <p class="hero-uiss__eyebrow" data-reveal>{project.category}</p>
+          <h1 class="display hero-uiss__title" data-reveal data-hero-rule-from>{project.title}</h1>
+          <ul class="hero-uiss__meta" data-hero-rule>
+            <li data-reveal><span class="hero-uiss__k">Client</span>{project.client}</li>
+            <li data-reveal><span class="hero-uiss__k">Year</span>{project.year}</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Lede ────────────────────────────────────────────────────────── -->
+    <section class="section uiss__lede">
+      <div class="wrap uiss__lede-grid">
+        <h2 class="display uiss__lede-title" data-reveal>Overview</h2>
+        <div class="uiss__lede-copy">
+          {lede.map((para) => <p data-reveal>{para}</p>)}
+        </div>
+      </div>
+    </section>
+
+    <!-- ── UISS 1.0: base image + tabbed panels ────────────────────────── -->
+    <section class="section uiss__phase" id="uiss-1">
+      <div class="wrap">
+        <header class="uiss__phase-head">
+          <p class="eyebrow" data-reveal>Phase 01 · UISS 1.0</p>
+          <h2 class="display uiss__phase-title" data-reveal>The launch edition</h2>
+        </header>
+
+        <figure class="uiss__anchor" data-reveal>
+          <img src={baseImage} alt={`${project.title} — launch edition`} />
+        </figure>
+
+        <!-- Tab bar sits on the image's bottom edge on desktop, below it on
+             mobile. Buttons, not links, so no hash lands in the URL — a
+             fragment triggers the pre-paint jump handling in theme-init.js,
+             which can't resolve a panel that starts collapsed. -->
+        <div class="uiss__tabs" role="tablist" aria-label="UISS 1.0 workstreams">
+          {
+            tabs.map((t, i) => (
+              <button
+                class:list={['uiss__tab', { 'is-active': i === 0 }]}
+                type="button"
+                role="tab"
+                id={`uiss-tab-${t.key}`}
+                aria-controls={`uiss-panel-${t.key}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                data-uiss-tab={t.key}
+              >
+                {t.label}
+              </button>
+            ))
+          }
+        </div>
+
+        <!-- Panels are collapsed by CSS gated on `html.js` (set before paint in
+             theme-init.js), so there's no flash of all three on load and a
+             no-JS visitor still gets every panel stacked and readable.
+             Nothing inside a panel carries `data-reveal`: those start at
+             opacity 0 and their ScrollTrigger is registered against a
+             display:none element, so the content could never fade in. -->
+        <div class="uiss__panels">
+          <!-- Event Branding -->
+          <section
+            class="uiss__panel is-active"
+            id="uiss-panel-branding"
+            role="tabpanel"
+            aria-labelledby="uiss-tab-branding"
+            data-uiss-panel="branding"
+            tabindex="0"
+          >
+            <div class="uiss__panel-copy">
+              <h3 class="uiss__panel-title display">Event Branding</h3>
+              {/* <<PLACEHOLDER>> */}
+              <p>
+                The launch event set the template for everything after it: a stage identity, signage
+                system and delegate collateral built for a room holding embassy leadership,
+                ministry officials and founders at the same time.
+              </p>
+              <p>
+                Most of the work was navigating approvals rather than drawing — every asset carrying
+                the Embassy mark cleared protocol review, so the system was designed to survive
+                changes late: fixed lockup zones, one type hierarchy, colour that held up in print
+                and on an LED wall.
+              </p>
+              <p>
+                Turnarounds ran in hours, not days. Speaker lists moved the morning of the event, so
+                backdrop and screen assets were built as templates I could re-export on site.
+              </p>
+            </div>
+
+            <div class="uiss__shots">
+              {
+                brandingShots.map((shot) => (
+                  <figure class="uiss__shot">
+                    {shot.src ? (
+                      <img src={shot.src} alt={shot.caption} loading="lazy" />
+                    ) : (
+                      <span class="uiss__ph">
+                        <span>Image coming soon</span>
+                      </span>
+                    )}
+                    <figcaption>{shot.caption}</figcaption>
+                  </figure>
+                ))
+              }
+            </div>
+          </section>
+
+          <!-- UI Design -->
+          <section
+            class="uiss__panel"
+            id="uiss-panel-ui"
+            role="tabpanel"
+            aria-labelledby="uiss-tab-ui"
+            data-uiss-panel="ui"
+            tabindex="0"
+          >
+            <div class="uiss__panel-copy">
+              <h3 class="uiss__panel-title display">UI Design</h3>
+              <p>
+                {/* <<PLACEHOLDER>> */}
+                The platform side of the programme, written up as a case study — including what the
+                constraints made impossible.
+              </p>
+            </div>
+
+            <!-- Screens. Each slot holds its final aspect ratio while empty, so
+                 dropping real screenshots in never reflows the layout. -->
+            <figure class="uiss__screen uiss__screen--lead">
+              {
+                uiLeadScreen.src ? (
+                  <img src={uiLeadScreen.src} alt={uiLeadScreen.caption} loading="lazy" />
+                ) : (
+                  <span class="uiss__ph">
+                    <span class="uiss__ph-k">16:9</span>
+                    <span>Screen coming soon</span>
+                  </span>
+                )
+              }
+              <figcaption>{uiLeadScreen.caption}</figcaption>
+            </figure>
+
+            <div class="uiss__screen-row">
+              {
+                uiScreens.map((screen) => (
+                  <figure class="uiss__screen uiss__screen--tall">
+                    {screen.src ? (
+                      <img src={screen.src} alt={screen.caption} loading="lazy" />
+                    ) : (
+                      <span class="uiss__ph">
+                        <span class="uiss__ph-k">9:16</span>
+                        <span>Screen coming soon</span>
+                      </span>
+                    )}
+                    <figcaption>{screen.caption}</figcaption>
+                  </figure>
+                ))
+              }
+            </div>
+
+            <blockquote class="uiss__statement">
+              <span class="uiss__statement-lead">{uiStatement.lead}</span>
+              {uiStatement.rest}
+            </blockquote>
+
+            <div class="uiss__ux">
+              {
+                uxBlocks.map((block) => (
+                  <div class="uiss__ux-block">
+                    <h4 class="uiss__ux-title">{block.title}</h4>
+                    <div class="uiss__ux-body">
+                      {block.body?.map((para) => <p>{para}</p>)}
+                      {block.list && (
+                        <ul class="uiss__ux-list">
+                          {block.list.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {block.cards && (
+                        <div class="uiss__ux-cards">
+                          {block.cards.map((card) => (
+                            <div class="uiss__ux-card">
+                              <span class="uiss__ux-card-label">{card.label}</span>
+                              <p>{card.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {block.media && (
+                        <div class="uiss__ux-media">
+                          {block.media.map((item) => (
+                            <figure class="uiss__ux-figure">
+                              {item.src ? (
+                                <img src={item.src} alt={item.caption} loading="lazy" />
+                              ) : (
+                                <span class="uiss__ph">
+                                  <span>Image coming soon</span>
+                                </span>
+                              )}
+                              <figcaption>{item.caption}</figcaption>
+                            </figure>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </section>
+
+          <!-- Promotional Content -->
+          <section
+            class="uiss__panel"
+            id="uiss-panel-content"
+            role="tabpanel"
+            aria-labelledby="uiss-tab-content"
+            data-uiss-panel="content"
+            tabindex="0"
+          >
+            <div class="uiss__panel-copy">
+              <h3 class="uiss__panel-title display">Promotional Content</h3>
+              {/* <<PLACEHOLDER>> */}
+              <p>
+                The campaign was the programme's reach engine. Cut vertical for Reels first rather
+                than trimmed down from a landscape master, the films crossed a million views and
+                pulled applications from founders the Council's mailing list never touched.
+              </p>
+              <p>
+                Shot and assembled from event footage the same week it was captured, graded for a
+                confident institutional look, and subtitled — most of the audience watched with the
+                sound off.
+              </p>
+            </div>
+
+            <div class="uiss__reels">
+              {
+                reels.map((reel) => (
+                  <figure class="uiss__reel">
+                    {reel.src ? (
+                      // No autoplay: playback stays user-initiated, which also
+                      // keeps it clear of prefers-reduced-motion.
+                      <video
+                        src={reel.src}
+                        poster={reel.poster}
+                        controls
+                        preload="metadata"
+                        playsinline
+                        aria-label={reel.label}
+                      />
+                    ) : (
+                      <div class="uiss__reel-ph">
+                        <span class="uiss__reel-ph-k">9:16</span>
+                        <span class="uiss__reel-ph-t">Video coming soon</span>
+                      </div>
+                    )}
+                    <figcaption>
+                      <span class="uiss__reel-label">{reel.label}</span>
+                      <span>{reel.meta}</span>
+                    </figcaption>
+                  </figure>
+                ))
+              }
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── UISS 2.0 ────────────────────────────────────────────────────── -->
+    <section class="section uiss2" id="uiss-2">
+      <div class="wrap uiss2__grid">
+        <div class="uiss2__intro">
+          <p class="eyebrow" data-reveal>{uiss2.eyebrow}</p>
+          <h2 class="display uiss2__title" data-reveal>{uiss2.title}</h2>
+        </div>
+        <div class="uiss2__copy">
+          {uiss2.body.map((para) => <p data-reveal>{para}</p>)}
+          <div class="uiss2__cta-row" data-reveal>
+            <a
+              class="uiss2__cta magnetic"
+              href={liveUrl}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              data-cursor="Visit"
+            >
+              <span class="magnetic__inner">Visit the live site ↗</span>
+            </a>
+            <a
+              class="uiss2__cta uiss2__cta--ghost magnetic"
+              href={guidelinesPdf}
+              target="_blank"
+              rel="noopener"
+              data-cursor="Open"
+            >
+              <span class="magnetic__inner">View brand guidelines ↓</span>
+            </a>
+          </div>
+          <p class="uiss2__cta-note" data-reveal>startupseries.ae</p>
+        </div>
+      </div>
+
+      <!-- Brand guidelines. The head sits on the same two-column grid as the
+           block above, so the copy keeps one left edge through the section;
+           only the document itself breaks out to full width. -->
+      <div class="wrap uiss2__guides">
+        <div class="uiss2__guides-head">
+          <div>
+            <p class="eyebrow" data-reveal>Brand guidelines</p>
+            <h3 class="display uiss2__guides-title" data-reveal>The rulebook, handed over</h3>
+          </div>
+          <div class="uiss2__guides-copy">
+            {guidelinesNote.map((para) => <p data-reveal>{para}</p>)}
+          </div>
+        </div>
+
+        {/* --embedded drives the swap: the frame shows on desktop and the link
+            card takes over on mobile, where framed PDFs don't render at all.
+            With `guidelinesEmbed` false the card simply shows everywhere. */}
+        <figure
+          class:list={['uiss2__pdf', { 'uiss2__pdf--embedded': guidelinesEmbed }]}
+          data-reveal
+        >
+          {
+            guidelinesEmbed && (
+              <iframe
+                class="uiss2__pdf-frame"
+                src={guidelinesPdf}
+                title={`${project.title} — brand guidelines`}
+                loading="lazy"
+              />
+            )
+          }
+          <a
+            class="uiss2__pdf-card"
+            href={guidelinesPdf}
+            target="_blank"
+            rel="noopener"
+            data-cursor="Open"
+          >
+            <span class="uiss2__pdf-kind">PDF</span>
+            <span class="uiss2__pdf-name">UISS 2.0 Brand Guidelines</span>
+            <span class="uiss2__pdf-meta">Opens in a new tab</span>
+            <span class="uiss2__pdf-cta">Open the document ↗</span>
+          </a>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ── Next project ────────────────────────────────────────────────── -->
+    <a class="uiss__next" href={`/work/${next.id}`} data-cursor="Next" style={`--a:${next.accent}`}>
+      <div class="wrap">
+        <span class="eyebrow">Next project</span>
+        <span class="display uiss__next-title">{next.title}</span>
+        <span class="uiss__next-cat">{next.category} →</span>
+      </div>
+    </a>
+  </main>
+</Layout>
+
+<style>
+  /* ── Shared header over this page's dark hero ───────────────────────── */
+  /* Unlike the templated case studies, this page opens on a full-bleed dark
+     photo, so the fixed header sits on artwork instead of on --bg. In light
+     mode its ink is near-black and disappears. These are :global() because the
+     header is a separate component — the stylesheet still only ships with this
+     page, so nothing else is touched. */
+  :global(.post-head:not(.is-scrolled)),
+  :global(.post-head:not(.is-scrolled) .post-head__brand),
+  :global(.post-head:not(.is-scrolled) .post-head__right) {
+    color: #f4f0e6;
+  }
+  /* Once frosted, the bar spends the next screenful over the same dark photo.
+     20% of a cream --bg doesn't lighten it enough for near-black text, so in
+     light mode the backdrop goes mostly opaque and the theme's own ink works
+     over both the hero and the page below. Dark mode is already legible and
+     stays exactly as it is elsewhere on the site. */
+  :global([data-theme='light'] .post-head.is-scrolled) {
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+  }
+
+  /* ── Page tokens ────────────────────────────────────────────────────── */
+  /* One place for the values that were previously re-typed per component.
+     Two radii and three spacing steps are enough for this page; anything that
+     needs a fourth is a sign the layout, not the token, is wrong. */
+  .uiss {
+    --r: 8px; /* media, cards, containers */
+    --pill: 999px; /* buttons, badges, the tab bar */
+    --gap: clamp(1rem, 2.5vw, 2rem); /* between media in a grid */
+    --gap-tight: clamp(0.8rem, 1.6vw, 1.2rem); /* dense grids: cards */
+    --stack: clamp(2rem, 5vh, 3.5rem); /* between blocks inside a section */
+    --stack-lg: clamp(3rem, 8vh, 5rem); /* between major blocks */
+    /* The page's editorial grid: label/heading left, content right. Used by
+       Overview, the UX blocks and both halves of UISS 2.0, so body copy keeps
+       one left edge the whole way down. */
+    --col: 1fr 1.4fr;
+    --col-gap: clamp(1.5rem, 5vw, 5rem);
+  }
+
+  /* ── Hero ───────────────────────────────────────────────────────────── */
+  .hero-uiss {
+    position: relative;
+    /* Full-bleed: `.wrap` inside handles the max-width, so the image itself
+       runs edge to edge under the fixed header. */
+    width: 100%;
+    min-height: min(92vh, 900px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: radial-gradient(120% 120% at 25% 15%, var(--a), #000 92%);
+  }
+  .hero-uiss__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Scrim: the overlay type is fixed light in BOTH themes (it sits on a photo,
+     not on --bg), so it needs a guaranteed dark base under it. */
+  .hero-uiss::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.6) 38%,
+      rgba(0, 0, 0, 0.15) 70%,
+      rgba(0, 0, 0, 0.35) 100%
+    );
+  }
+  .hero-uiss__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    /* Top padding clears the fixed header if the viewport is short. */
+    padding: clamp(7rem, 18vh, 12rem) var(--pad) clamp(2.5rem, 7vh, 5rem);
+    color: #f4f0e6;
+  }
+  .hero-uiss__eyebrow {
+    font-size: var(--step--1);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(244, 240, 230, 0.72);
+  }
+  .hero-uiss__title {
+    font-size: clamp(2.4rem, 8vw, 7.5rem);
+    margin: 0.18em 0 0.5em;
+    max-width: 18ch;
+  }
+  /* The rule stops where the title's first line does. That width is only known
+     once the text has wrapped, so main.js measures it (`initHeroRule`) and
+     writes it to --rule-w. The fallback is the content-width rule, which is
+     what a no-JS visitor gets and what shows for the frame before the webfont
+     settles — never a full-viewport hairline over two short values. */
+  .hero-uiss__meta {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem clamp(2.5rem, 6vw, 5rem);
+    width: var(--rule-w, min(100%, 20rem));
+    max-width: 100%;
+    border-top: 1px solid rgba(244, 240, 230, 0.28);
+    padding-top: clamp(1rem, 2.5vh, 1.5rem);
+  }
+  .hero-uiss__meta li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: var(--step-0);
+  }
+  .hero-uiss__k {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(244, 240, 230, 0.66);
+  }
+
+  /* ── Lede ───────────────────────────────────────────────────────────── */
+  .uiss__lede-grid {
+    display: grid;
+    grid-template-columns: var(--col);
+    gap: var(--col-gap);
+  }
+  .uiss__lede-title {
+    font-size: var(--step-2);
+  }
+  .uiss__lede-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    max-width: 60ch;
+  }
+
+  /* ── Phase 01 ───────────────────────────────────────────────────────── */
+  .uiss__phase {
+    padding-top: 0;
+  }
+  .uiss__phase-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: var(--stack);
+  }
+  .uiss__phase-title {
+    font-size: var(--step-2);
+  }
+  .uiss__anchor {
+    position: relative;
+    aspect-ratio: 21 / 9;
+    border-radius: var(--r);
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--a), #000 95%);
+  }
+  .uiss__anchor img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Tab bar: frosted pill row overlapping the anchor image's bottom edge,
+     centred on it. It reads as a control belonging to the image rather than as
+     page content, which is why it sits centred while the copy below it hangs
+     off the left grid edge. */
+  .uiss__tabs {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: -1.6rem auto var(--stack);
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--pill);
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+  .uiss__tab {
+    /* 48px min target: finger-friendly without a media query. */
+    min-height: 48px;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--pill);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+    touch-action: manipulation;
+    transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  }
+  .uiss__tab:hover {
+    color: var(--fg);
+  }
+  .uiss__tab.is-active {
+    background: var(--accent);
+    color: #000;
+  }
+  /* Keyboard focus must stay visible — the custom cursor hides the OS one. */
+  .uiss__tab:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 2px;
+  }
+
+  /* Panels. Collapsed only when JS is running, so no-JS gets all three. */
+  html.js .uiss__panel {
+    display: none;
+  }
+  html.js .uiss__panel.is-active {
+    display: block;
+    animation: uiss-panel-in 0.5s var(--ease) both;
+  }
+  /* Without JS the panels stack, so they need separating. */
+  html:not(.js) .uiss__panel + .uiss__panel {
+    margin-top: var(--stack-lg);
+    padding-top: var(--stack-lg);
+    border-top: 1px solid var(--line);
+  }
+  @keyframes uiss-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .uiss__panel:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 6px;
+  }
+  .uiss__panel-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 62ch;
+  }
+  .uiss__panel-title {
+    font-size: var(--step-1);
+    margin-bottom: 0.4rem;
+  }
+
+  /* ── Shared media slots ─────────────────────────────────────────────── */
+  /* `contain`, never `cover`. Cover was cropping the sides off the event
+     photography and squeezing the wide web banner; letting each image run at
+     its natural ratio instead fixed the cropping but left the grids ragged,
+     with captions at different heights. So the slot keeps its ratio and the
+     image sits inside it whole, on a quiet plate that fills the remainder. */
+  .uiss__shot img,
+  .uiss__screen img,
+  .uiss__ux-figure img {
+    width: 100%;
+    border-radius: var(--r);
+    object-fit: contain;
+    background: var(--bg-soft);
+  }
+  /* Empty slot. Holds the footprint the image will take, so the layout reads
+     correctly while the files are still missing. */
+  .uiss__ph {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--r);
+    /* Deliberately quiet — a dashed outline reads as "slot awaiting a file".
+       An accent-filled tile competes with the real screenshots around it, and
+       there are enough of these on the page to swamp it. */
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    color: var(--fg-dim);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+  .uiss__ph-k {
+    padding: 0.25em 0.7em;
+    border: 1px solid currentColor;
+    border-radius: var(--pill);
+    opacity: 0.8;
+  }
+
+  /* Event Branding: image grid with captions. Items align to the top rather
+     than stretching, since uncropped images no longer share a height. */
+  .uiss__shots {
+    margin-top: var(--stack);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    gap: var(--gap);
+  }
+  .uiss__shot {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  /* 3:2 rather than 4:3 — it's what most of the event photography already is,
+     so the plate barely shows. */
+  .uiss__shot :is(img, .uiss__ph) {
+    aspect-ratio: 3 / 2;
+  }
+
+  /* Promotional Content: vertical 9:16 players, height-capped. Both dimensions
+     are stated rather than left to aspect-ratio, which would resolve against
+     the column width and overflow on wide viewports. */
+  /* One caption treatment for every media type on the page. */
+  .uiss__shot figcaption,
+  .uiss__screen figcaption,
+  .uiss__ux-figure figcaption,
+  .uiss__reel figcaption {
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+  }
+
+  .uiss__reels {
+    --reel-h: min(70vh, 620px);
+    margin-top: var(--stack);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+  }
+  .uiss__reel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: min(100%, calc(var(--reel-h) * 9 / 16));
+  }
+  .uiss__reel video,
+  .uiss__reel-ph {
+    width: 100%;
+    height: var(--reel-h);
+    border-radius: var(--r);
+    background: #000;
+    /* contain, so a clip whose ratio isn't exactly 9:16 is letterboxed rather
+       than cropped. */
+    object-fit: contain;
+  }
+  /* Same quiet treatment as the image slots — see .uiss__ph. */
+  .uiss__reel-ph {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.5rem;
+    background: var(--bg-soft);
+    border: 1px dashed var(--line);
+    color: var(--fg-dim);
+    text-align: center;
+  }
+  .uiss__reel-ph-k {
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    padding: 0.25em 0.7em;
+    border: 1px solid currentColor;
+    border-radius: var(--pill);
+    opacity: 0.8;
+  }
+  .uiss__reel-ph-t {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .uiss__reel figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  /* Two lines, but the same size and family as every other caption — the
+     display face here made the reels shout over the identically-ranked
+     captions in the other panels. */
+  .uiss__reel-label {
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  /* ── UI Design ──────────────────────────────────────────────────────── */
+  /* Screens: one wide lead shot, then a row of phone-ratio slots. */
+  .uiss__screen {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .uiss__screen--lead {
+    margin-top: var(--stack);
+  }
+  /* Height-capped while empty: at full width a 16:9 slot is ~675px of dashed
+     nothing and the panel opens on a void. The cap only applies to the
+     placeholder — a real screenshot arrives at its own ratio. */
+  .uiss__screen--lead :is(img, .uiss__ph) {
+    aspect-ratio: 16 / 9;
+  }
+  .uiss__screen--lead .uiss__ph {
+    max-height: min(52vh, 460px);
+  }
+  /* Column width is capped rather than fluid: three 9:16 slots across a 1600px
+     row would each compute well over a screen tall. Left-aligned, like every
+     other block on the page. */
+  .uiss__screen-row {
+    margin-top: var(--gap);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 240px));
+    justify-content: start;
+    align-items: start;
+    gap: var(--gap);
+  }
+  .uiss__screen--tall :is(img, .uiss__ph) {
+    aspect-ratio: 9 / 16;
+  }
+
+  /* Pull quote — the research conclusion, stated once and loudly. */
+  .uiss__statement {
+    margin: clamp(2.5rem, 7vh, 4.5rem) 0 clamp(1rem, 3vh, 2rem);
+    max-width: 40ch;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    font-size: clamp(1.15rem, 2.2vw, 1.9rem);
+  }
+  .uiss__statement-lead {
+    color: var(--accent-ink);
+  }
+
+  /* Label / content rows — on the page's shared grid, so this content column
+     starts at the same left edge as the Overview and UISS 2.0 copy. */
+  .uiss__ux {
+    margin-top: var(--stack);
+  }
+  .uiss__ux-block {
+    display: grid;
+    grid-template-columns: var(--col);
+    gap: var(--col-gap);
+    padding: clamp(1.4rem, 3.5vh, 2.2rem) 0;
+    border-top: 1px solid var(--line);
+  }
+  .uiss__ux-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-0);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent-ink);
+  }
+  .uiss__ux-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  /* Prose keeps a readable measure; card grids and image rows take the whole
+     column, which is why the cap sits here and not on the flex parent. */
+  .uiss__ux-body > p,
+  .uiss__ux-list {
+    max-width: 62ch;
+  }
+  .uiss__ux-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .uiss__ux-list li {
+    padding-left: 1.4rem;
+    position: relative;
+    color: var(--fg-dim);
+  }
+  .uiss__ux-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent-ink);
+  }
+
+  /* Card grid — used where a block is a set of discrete points (goals,
+     impact) rather than continuous prose. */
+  .uiss__ux-cards {
+    display: grid;
+    /* Wraps to two-up before the third card gets too narrow to read — the
+       content column is 58% of the grid, not the full width. */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--gap-tight);
+  }
+  .uiss__ux-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: clamp(1rem, 2vw, 1.4rem);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--bg-soft);
+  }
+  /* Body face, not the display face: the block label to its left is already
+     display/uppercase/accent, and two 700-weight display labels in one row
+     read as competing headings rather than a structure and its content. */
+  .uiss__ux-card-label {
+    font-weight: 700;
+    font-size: var(--step-0);
+    line-height: 1.2;
+  }
+  .uiss__ux-card p {
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+  }
+
+  /* Image slots attached to a block (wireframes, journey maps, audits). */
+  .uiss__ux-media {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    align-items: start;
+    gap: var(--gap);
+  }
+  .uiss__ux-figure {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .uiss__ux-figure :is(img, .uiss__ph) {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* ── Phase 02 ───────────────────────────────────────────────────────── */
+  /* The project accent is a corner glow, not a field: at 30% over 80%×120% it
+     washed the whole right half at wide viewports and put a red CTA on a
+     purple ground. Tightened and dropped so the accent stays concentrated in
+     the document tile below, which is the one object that should carry it. */
+  .uiss2 {
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(
+        55% 85% at 100% 0%,
+        color-mix(in srgb, var(--a) 16%, transparent),
+        transparent 68%
+      ),
+      var(--bg-soft);
+  }
+  .uiss2__grid {
+    display: grid;
+    grid-template-columns: var(--col);
+    gap: var(--col-gap);
+  }
+  .uiss2__title {
+    font-size: var(--step-2);
+    margin-top: 0.3em;
+  }
+  .uiss2__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    max-width: 60ch;
+  }
+  .uiss2__cta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: var(--gap-tight);
+  }
+  .uiss2__cta {
+    display: inline-block;
+    min-height: 48px;
+    border: 1px solid var(--accent);
+    border-radius: var(--pill);
+    padding: 0.9rem 1.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--step--1);
+    overflow: hidden;
+    touch-action: manipulation;
+    transition: background 0.4s var(--ease), color 0.4s var(--ease),
+      border-color 0.4s var(--ease);
+  }
+  /* The one action this page is asking for, so it is the one filled button.
+     Elsewhere on the site the pill starts outlined and fills on hover; here
+     that read is inverted, because an outlined primary next to an outlined
+     secondary gave the pair no hierarchy at all. */
+  .uiss2__cta:not(.uiss2__cta--ghost) {
+    background: var(--accent);
+    color: #000;
+  }
+  .uiss2__cta:not(.uiss2__cta--ghost):hover {
+    background: transparent;
+    color: var(--fg);
+    border-color: var(--fg);
+  }
+  .uiss2__cta:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 3px;
+  }
+  /* Secondary action: outline only, so the live-site link keeps priority. */
+  .uiss2__cta--ghost {
+    border-color: var(--line);
+    color: var(--fg-dim);
+  }
+  .uiss2__cta--ghost:hover {
+    color: var(--fg);
+    border-color: var(--fg);
+  }
+  /* Caption for the pair, not a third item in the row — inside the flex row it
+     wrapped onto its own line and read as a broken button. */
+  .uiss2__cta-note {
+    margin-top: 0.9rem;
+    font-size: var(--step--1);
+    color: var(--fg-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* Brand guidelines. Head on the shared grid; the document breaks out wide. */
+  .uiss2__guides {
+    margin-top: var(--stack-lg);
+  }
+  .uiss2__guides-head {
+    display: grid;
+    grid-template-columns: var(--col);
+    gap: var(--col-gap);
+  }
+  .uiss2__guides-title {
+    font-size: var(--step-1);
+    margin-top: 0.3em;
+  }
+  .uiss2__guides-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 62ch;
+    color: var(--fg-dim);
+  }
+  .uiss2__pdf {
+    margin-top: var(--stack);
+  }
+  .uiss2__pdf-frame {
+    display: block;
+    width: 100%;
+    height: min(85vh, 900px);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--bg);
+  }
+  /* Link card. The whole content while the embed is off, and the mobile
+     treatment once it's on — iOS Safari won't render a framed PDF at all. */
+  .uiss2__pdf-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    min-height: clamp(190px, 32vh, 280px);
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    border-radius: var(--r);
+    background: linear-gradient(135deg, var(--a), #000 95%);
+    color: #f4f0e6;
+  }
+  .uiss2__pdf-card:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: -5px;
+  }
+  .uiss2__pdf--embedded .uiss2__pdf-card {
+    display: none;
+  }
+  .uiss2__pdf-kind {
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25em 0.6em;
+    border: 1px solid currentColor;
+    border-radius: var(--pill);
+    opacity: 0.85;
+  }
+  .uiss2__pdf-name {
+    margin-top: auto;
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.05;
+    font-size: clamp(1.1rem, 2.2vw, 1.9rem);
+  }
+  .uiss2__pdf-meta {
+    font-size: var(--step--1);
+    opacity: 0.7;
+  }
+  .uiss2__pdf-cta {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: transform 0.4s var(--ease);
+  }
+  .uiss2__pdf-card:hover .uiss2__pdf-cta {
+    transform: translateX(4px);
+  }
+
+  /* ── Next project ───────────────────────────────────────────────────── */
+  .uiss__next {
+    display: block;
+    border-top: 1px solid var(--line);
+    padding: clamp(3rem, 10vh, 7rem) 0;
+    transition: background 0.5s var(--ease);
+  }
+  .uiss__next:hover {
+    background: var(--a);
+  }
+  /* Inset, because the band runs the full width of the viewport. */
+  .uiss__next:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: -6px;
+  }
+  .uiss__next .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-inline: var(--pad);
+  }
+  .uiss__next-title {
+    font-size: var(--step-2);
+    transition: color 0.4s var(--ease);
+  }
+  .uiss__next:hover .uiss__next-title,
+  .uiss__next:hover .eyebrow,
+  .uiss__next:hover .uiss__next-cat {
+    color: #000;
+  }
+  .uiss__next-cat {
+    font-size: var(--step-0);
+    color: var(--fg-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────── */
+  @media (max-width: 820px) {
+    /* One column below this width — the shared grid collapses everywhere at
+       once, so the stacked order stays consistent section to section. */
+    .uiss__lede-grid,
+    .uiss2__grid,
+    .uiss2__guides-head,
+    .uiss__ux-block {
+      grid-template-columns: 1fr;
+    }
+    .uiss__lede-grid,
+    .uiss2__grid,
+    .uiss2__guides-head {
+      gap: 1.2rem;
+    }
+    .uiss__ux-block {
+      gap: 0.8rem;
+    }
+    /* Tab bar clears the image instead of overlapping it — a pill row wrapping
+       to two lines over the photo eats the shot and hurts legibility. */
+    .uiss__tabs {
+      width: 100%;
+      justify-content: flex-start;
+      margin-top: 1rem;
+      border-radius: var(--r);
+    }
+    .uiss__tab {
+      flex: 1 1 auto;
+      text-align: center;
+      padding-inline: 1rem;
+    }
+    .uiss__shots {
+      grid-template-columns: 1fr;
+    }
+    .uiss__reels {
+      --reel-h: min(64vh, 520px);
+    }
+    /* Let the phone slots fill the row instead of holding a 240px cap, so two
+       sit side by side rather than stranding whitespace. */
+    .uiss__screen-row {
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+    /* A framed PDF is unusable at this width, and iOS Safari refuses to render
+       one at all — hand over to the link card. */
+    .uiss2__pdf--embedded .uiss2__pdf-frame {
+      display: none;
+    }
+    .uiss2__pdf--embedded .uiss2__pdf-card {
+      display: flex;
+    }
+  }
+</style>
