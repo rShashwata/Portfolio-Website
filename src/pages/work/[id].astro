@@ -24,18 +24,31 @@ type MediaItem = {
   src?: string;
   poster?: string;
   vertical?: boolean;
+  label?: string;
+  meta?: string;
+  cover?: string;
 };
 type GalleryItem = string | MediaItem;
 const galleryItems: GalleryItem[] | null =
   Array.isArray(project.gallery) && project.gallery.length ? project.gallery : null;
 const isMedia = (item: GalleryItem): item is MediaItem =>
   typeof item === 'object' && item !== null;
-// 'image' | 'youtube' | 'video' | 'pdf'
+// 'image' | 'youtube' | 'video' | 'pdf' | 'doc'
 const kindOf = (item: GalleryItem) => (isMedia(item) ? item.type : 'image');
 // Players (YouTube or self-hosted) are 16:9 unless flagged vertical (9:16).
 const isPlayer = (item: GalleryItem) =>
   kindOf(item) === 'youtube' || kindOf(item) === 'video';
 const isVertical = (item: GalleryItem) => isMedia(item) && item.vertical === true;
+// Badge for a `doc` tile: the file extension, or DOC if the URL has none.
+const docExt = (src = '') => {
+  const match = src.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i);
+  return match ? match[1].toUpperCase() : 'DOC';
+};
+// Fall back to a readable filename when no `label` is given.
+const docName = (src = '') => {
+  const last = decodeURIComponent(src.split(/[?#]/)[0].split('/').pop() || '');
+  return last.replace(/\.[a-z0-9]{2,5}$/i, '') || 'Document';
+};
 const placeholders = [0, 1, 2, 3];
 ---
 
@@ -106,6 +119,8 @@ const placeholders = [0, 1, 2, 3];
                         'post__tile--video': isPlayer(item) && !isVertical(item),
                         'post__tile--video-portrait': isPlayer(item) && isVertical(item),
                         'post__tile--doc': kindOf(item) === 'pdf',
+                        'post__tile--link': kindOf(item) === 'doc',
+                        'post__tile--cover': kindOf(item) === 'doc' && isMedia(item) && !!item.cover,
                       },
                     ]}
                     data-reveal
@@ -138,6 +153,25 @@ const placeholders = [0, 1, 2, 3];
                         title={`${project.title} — document ${i + 1}`}
                         loading="lazy"
                       />
+                    ) : item.type === 'doc' ? (
+                      // Link, not an embed: navigation isn't subject to CSP or
+                      // the file host's X-Frame-Options, so this works for any
+                      // URL anywhere — including hosts we don't allowlist.
+                      <a
+                        class:list={['post__doc', { 'post__doc--cover': item.cover }]}
+                        href={item.src}
+                        target="_blank"
+                        rel="noopener"
+                        data-cursor="Open"
+                      >
+                        {item.cover && (
+                          <img class="post__doc-img" src={item.cover} alt="" loading="lazy" />
+                        )}
+                        <span class="post__doc-kind">{docExt(item.src)}</span>
+                        <span class="post__doc-name">{item.label || docName(item.src)}</span>
+                        {item.meta && <span class="post__doc-meta">{item.meta}</span>}
+                        <span class="post__doc-cta">View ↗</span>
+                      </a>
                     ) : null}
                   </figure>
                 ))
@@ -328,6 +362,108 @@ const placeholders = [0, 1, 2, 3];
     aspect-ratio: auto;
     height: min(85vh, 900px);
     opacity: 1;
+  }
+
+  /* Document link tile — keeps the normal 4:3 grid rhythm. */
+  .post__tile--link {
+    opacity: 1;
+  }
+  /* With a cover page: A4 (210:297) at a capped height, same approach as the
+     vertical video tile — both dimensions stated so nothing overflows. */
+  .post__tile--cover {
+    --cover-h: min(78vh, 720px);
+    /* A4 by default so narrow columns wrap the page exactly; the cap stops it
+       running past the viewport once the column gets wide. */
+    aspect-ratio: 210 / 297;
+    max-height: var(--cover-h);
+  }
+  .post__doc--cover {
+    position: relative;
+    padding: 0;
+    justify-content: flex-end;
+  }
+  /* Scoped through the tile class so it outranks `.post__tile img`, which
+     otherwise forces width:100% and object-fit:cover and crops the page. */
+  .post__tile--cover .post__doc-img {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: min(100%, calc(var(--cover-h) * 210 / 297));
+    height: 100%;
+    /* contain, never cover — cropping a cover page cuts off its title */
+    object-fit: contain;
+  }
+  /* Scrim so the caption stays legible over any cover artwork. */
+  .post__doc--cover::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
+    pointer-events: none;
+    z-index: 1;
+  }
+  .post__doc--cover > span {
+    position: relative;
+    z-index: 2;
+    margin-inline: clamp(1.2rem, 3vw, 2rem);
+  }
+  /* The scrim only backs the caption, so the badge needs its own plate —
+     cover artwork is often pale up top and the outline alone disappears. */
+  .post__doc--cover > .post__doc-kind {
+    position: absolute;
+    top: clamp(1.2rem, 3vw, 2rem);
+    left: 0;
+    background: rgba(0, 0, 0, 0.55);
+    border-color: rgba(244, 240, 230, 0.35);
+    opacity: 1;
+  }
+  .post__doc--cover > .post__doc-cta {
+    margin-bottom: clamp(1.2rem, 3vw, 2rem);
+  }
+  .post__doc {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+    height: 100%;
+    padding: clamp(1.2rem, 3vw, 2rem);
+    /* The tile sits on an accent→black gradient in BOTH themes, so this is
+       deliberately not var(--fg) — that flips to near-black on light and
+       leaves dark text on a dark tile. */
+    color: #f4f0e6;
+    text-decoration: none;
+  }
+  .post__doc-kind {
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25em 0.6em;
+    border: 1px solid currentColor;
+    border-radius: 100px;
+    opacity: 0.85;
+  }
+  .post__doc-name {
+    margin-top: auto;
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.05;
+    font-size: clamp(1.1rem, 2.2vw, 1.9rem);
+  }
+  .post__doc-meta {
+    font-size: var(--step--1);
+    opacity: 0.7;
+  }
+  .post__doc-cta {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: transform 0.4s var(--ease);
+  }
+  .post__tile--link:hover .post__doc-cta {
+    transform: translateX(4px);
   }
 
   .post__next {

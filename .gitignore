@@ -14,3 +14,7 @@ npm-debug.log*
 Thumbs.db
 # claude code local settings (machine-specific permissions)
 .claude/settings.local.json
+# pdf cover tool: local python venv + the drop folder for source PDFs
+# (PDFs live on R2, not in the repo — only the rendered covers get committed)
+tools/.venv/
+tools/pdf-inbox/

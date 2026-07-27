@@ -5,12 +5,13 @@
 //  the components.
 // ───────────────────────────────────────────────────────────────────────────
 
-// Cloudflare R2 bucket for large videos and heavy documents. Small images stay
-// in /public (they ship with the build and need no extra request hop).
-// Referenced as `${R2}/…` below. If this ever moves to a custom domain, change
-// it here AND in the CSP in public/_headers — the CSP names the host exactly,
-// so a mismatch means assets silently fail to load.
-export const R2 = 'https://pub-574039bbb93247d39bad622ae03f49f9.r2.dev';
+// Cloudflare R2 bucket (custom domain) for large videos and heavy documents.
+// Small images stay in /public — they ship with the build and need no extra
+// request hop. Referenced as `${R2}/…` below.
+// If this host ever changes, change it here AND in the CSP in public/_headers
+// (img-src, media-src and frame-src all name it exactly) — otherwise the
+// browser blocks every asset from the new host and it fails silently.
+export const R2 = 'https://media.shashwataroy.com';
 
 export const profile = {
   name: 'SHASHWATA ROY',
@@ -91,8 +92,36 @@ export const categories = [
 //                           { type: 'video', src: `${R2}/work/short.mp4`,
 //                             vertical: true }
 //
-//                      4. PDF — embedded document (R2 or local).
-//                           { type: 'pdf', src: `${R2}/docs/case-study.pdf` }
+//                      4. DOC — a link tile for any document. Opens in a new
+//                         tab. `label`, `meta` and `cover` are all optional;
+//                         the badge (PDF, DOCX…) comes from the file extension.
+//                           { type: 'doc',
+//                             src: `${R2}/uae-india-aviation-report.pdf`,
+//                             label: 'UAE-India Monthly Aviation Report',
+//                             meta: 'PDF · 11 pages · 8.7 MB',
+//                             cover: '/img/work/monolith/…-cover.jpg' }
+//                         `cover` is an ordinary IMAGE of the first page —
+//                         browsers can't rasterise a PDF, so export page 1 as
+//                         a JPG (~1200px wide) and drop it in /public. With a
+//                         cover the tile takes A4 proportions; without one it
+//                         falls back to a plain accent card.
+//                         Works with ANY url, including other people's sites —
+//                         a link is a navigation, not a page resource, so the
+//                         CSP allowlist doesn't apply to it at all:
+//                           { type: 'doc', src: 'https://someone-else.com/x.pdf',
+//                             label: 'Featured in …' }
+//
+//                      5. PDF — embedded inline (an iframe, reads in-page).
+//                           { type: 'pdf', src: '/cv/shashwata-resume-2026.pdf' }
+//                         Use for LOCAL /public files. R2-hosted PDFs will not
+//                         embed while the media domain returns
+//                         `X-Frame-Options: SAMEORIGIN` (a Cloudflare zone-level
+//                         security-headers transform). That header comes from
+//                         the file's own host, so no CSP change here overrides
+//                         it — it must be lifted for that hostname in
+//                         Cloudflare. Prefer `doc` for anything big: iOS Safari
+//                         refuses to render framed PDFs regardless, and an
+//                         embed downloads the whole file on page load.
 //
 //                      Layout: the first item spans full width. Any 16:9 player
 //                      (YouTube or video) takes its own full-width row; vertical
@@ -152,6 +181,16 @@ export const projects = [
     description: [
       'A modular visual language for an independent record label, designed to flex across dozens of releases while staying unmistakably theirs.',
       'Bold grids, heavy type and a restrained palette let the music — and the artwork — do the talking.',
+    ],
+    // DEMO CONTENT — replace when this case study is written up.
+    gallery: [
+      {
+        type: 'doc',
+        src: `${R2}/UAE-India%20Monthly%20Aviation%20Report.pdf`,
+        label: 'UAE-India Market Intelligence Report',
+        meta: 'PDF · 11 pages · 8.8 MB',
+        cover: '/img/work/monolith/uae-india-monthly-aviation-report-cover.jpg',
+      },
     ],
   },
   {

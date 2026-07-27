@@ -564,7 +564,7 @@ function initAbout() {
 
 // ── Work rows: cursor-following thumbnail + accent tint ──────────────────
 function initWork() {
-  const hiders = [];
+  const entries = [];
   document.querySelectorAll('[data-work-row]').forEach((row) => {
     const accent = row.getAttribute('data-accent');
     if (accent) row.style.setProperty('--row-accent', accent);
@@ -576,19 +576,19 @@ function initWork() {
     const yTo = gsap.quickTo(thumb, 'y', { duration: 0.5, ease: 'power3' });
 
     let shown = false;
-    const show = (e) => {
+    const show = (x, y) => {
       if (!shown) {
         shown = true;
         // Snap to the cursor before revealing so it scales up in place
         // instead of easing in from a stale position. The second arg sets
         // quickTo's start value too, so later moves don't drift from it.
-        xTo(e.clientX, e.clientX);
-        yTo(e.clientY, e.clientY);
+        xTo(x, x);
+        yTo(y, y);
         gsap.to(thumb, { opacity: 1, scale: 1, duration: 0.4, ease: 'power3', overwrite: 'auto' });
         return;
       }
-      xTo(e.clientX);
-      yTo(e.clientY);
+      xTo(x);
+      yTo(y);
     };
     const hide = () => {
       if (!shown) return;
@@ -596,18 +596,38 @@ function initWork() {
       gsap.to(thumb, { opacity: 0, scale: 0.85, duration: 0.35, ease: 'power3', overwrite: 'auto' });
     };
 
-    row.addEventListener('pointerenter', show);
-    row.addEventListener('pointermove', show);
+    row.addEventListener('pointerenter', (e) => show(e.clientX, e.clientY));
+    row.addEventListener('pointermove', (e) => show(e.clientX, e.clientY));
     row.addEventListener('pointerleave', hide);
-    hiders.push(hide);
+    entries.push({ row, show, hide });
   });
 
+  if (!entries.length || !lenis) return;
+
   // Smooth scroll slides rows beneath a stationary cursor without reliably
-  // firing pointerleave, which left thumbnails frozen mid-screen. Hide them
-  // all on scroll; pointermove re-shows the one actually under the cursor.
-  if (hiders.length && lenis) {
-    lenis.on('scroll', () => hiders.forEach((hide) => hide()));
-  }
+  // firing pointerenter/pointerleave, which used to leave a thumbnail frozen
+  // mid-screen. Re-resolve what the cursor is actually over on each scroll
+  // frame: blanket-hiding instead fought pointermove and made the thumbnail
+  // flicker whenever a row scrolled under a moving cursor.
+  let px = 0;
+  let py = 0;
+  let havePointer = false;
+  window.addEventListener(
+    'pointermove',
+    (e) => {
+      px = e.clientX;
+      py = e.clientY;
+      havePointer = true;
+    },
+    { passive: true }
+  );
+
+  lenis.on('scroll', () => {
+    if (!havePointer) return;
+    // The thumb is pointer-events:none, so it can't shadow the row here.
+    const row = document.elementFromPoint(px, py)?.closest('[data-work-row]');
+    entries.forEach((entry) => (entry.row === row ? entry.show(px, py) : entry.hide()));
+  });
 }
 
 // ── Marquees: seamless loop + scroll-velocity speed/skew ─────────────────

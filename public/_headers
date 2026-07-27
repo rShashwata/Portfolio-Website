@@ -3,4 +3,4 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://pub-574039bbb93247d39bad622ae03f49f9.r2.dev https://startupseries.ae; media-src 'self' https://pub-574039bbb93247d39bad622ae03f49f9.r2.dev; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://pub-574039bbb93247d39bad622ae03f49f9.r2.dev; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://media.shashwataroy.com https://startupseries.ae; media-src 'self' https://media.shashwataroy.com; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://media.shashwataroy.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
