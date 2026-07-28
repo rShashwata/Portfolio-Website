@@ -65,6 +65,10 @@ export const categories = [
 //      `media`       → big hero image. null = placeholder.
 //                      Keep project files in /public/img/work/<id>/ so each case
 //                      study owns one folder, e.g. '/img/work/neon-pulse/hero.jpg'
+//                      Same rule for any local (non-R2) document a case study
+//                      embeds: /public/docs/<id>/, e.g.
+//                      '/docs/uae-india-start-up-series/brand-guidelines.pdf'
+//                      — mirrors the img/work/<id>/ folder, not a flat docs/.
 //      `client`,`role` → shown in the case-study meta
 //      `services`    → array of tags, e.g. ['Editing', 'Color']
 //      `description` → array of paragraphs (the "Overview" text)
@@ -146,7 +150,7 @@ export const projects = [
     year: '2025',
     accent: '#8c00ff',
     media: '/img/work/uae-india-start-up-series/banner-top-5-scaled.webp',
-    client: 'Envoy Strategy',
+    client: 'UAE Embassy in India - CEPA Council',
     role: 'Lead Designer',
     services: ['Brand Identity', 'Logo System', 'Guidelines', 'Motion'],
     description: [

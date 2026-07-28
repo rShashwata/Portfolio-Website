@@ -19,7 +19,7 @@
 // ───────────────────────────────────────────────────────────────────────────
 import Layout from '../../layouts/Layout.astro';
 import CaseHead from '../../components/CaseHead.astro';
-import { projects, profile, R2 } from '../../data/site.js';
+import { projects, profile } from '../../data/site.js';
 
 // Every slot is declared nullable so a missing asset renders a placeholder
 // instead of a broken tag, and so the arrays below stay one uniform shape.
@@ -45,10 +45,10 @@ const next = projects[(index + 1) % projects.length];
 // Anchor image for the UISS 1.0 section — the tab bar sits on its bottom edge.
 const baseImage = '/img/work/uae-india-start-up-series/uicc-start-up-series-pitch-event-37.jpg';
 
-// Page-level lede. <<PLACEHOLDER>>
+// Page-level lede.
 const lede = [
-  'The UAE-India Start-Up Series is the flagship cross-border start-up platform run under the CEPA framework — a pitch stage where founders from both markets meet investors, regulators and embassy leadership in the same room.',
-  'I owned the visual system end to end across two editions: the launch identity and event branding for UISS 1.0, the promotional film and social campaign that carried it, and the interface design for the platform that followed.',
+  'The UAE-India Start-Up Series is a flagship cross-border start-up platform run under the CEPA framework — a pitch stage where founders from the Indian market meet investors, regulators and embassy leadership in the same room, to get the opportunity to get funding and incubation assistance in the UAE market, to help them scale their brand on a global stage.',
+  'I designed the visual branding for both editions: the launch event branding for UISS 1.0, the website design for the platform, and the promotional content and social campaign that followed and carried it.',
 ];
 
 // TAB 1 — Event Branding. `src: null` → placeholder tile.
@@ -207,7 +207,7 @@ const uxBlocks: UxBlock[] = [
 //                public/robots.txt, which stops the page being crawled at all.
 const liveUrl = 'https://startupseries.ae';
 const uiss2 = {
-  eyebrow: 'Phase 02',
+  eyebrow: 'Edition 02',
   title: 'UISS 2.0',
   // <<PLACEHOLDER>>
   body: [
@@ -216,25 +216,26 @@ const uiss2 = {
   ],
 };
 
-// ── Brand guidelines PDF (R2) ─────────────────────────────────────────────
-//  One URL drives both the button and the inline embed. Placeholder filename —
-//  upload the file and correct it here.
-const guidelinesPdf = `${R2}/uae-india-start-up-series-brand-guidelines.pdf`;
+// ── Brand guidelines PDF ──────────────────────────────────────────────────
+//  Served from /public, NOT from R2, and deliberately so: an R2-hosted PDF
+//  cannot be framed while media.shashwataroy.com returns `X-Frame-Options:
+//  SAMEORIGIN`, and that header comes from the file's own host, so nothing in
+//  our CSP can override it. Same-origin is already allowed by `frame-src
+//  'self'`, so a local file embeds with no header work at all.
+//
+//  Docs are namespaced by project, same as /public/img/work/<id>/ — so drop the
+//  PDF at  public/docs/<ID>/<GUIDELINES_FILE>  (ID is the slug const above).
+const GUIDELINES_FILE = 'uiss-2.0-branding-guidelines.pdf';
+const guidelinesPdf = `/docs/${ID}/${GUIDELINES_FILE}`;
 
-//  HEADS UP before flipping this to `true`: an R2-hosted PDF will NOT render in
-//  a frame while media.shashwataroy.com returns `X-Frame-Options: SAMEORIGIN`
-//  (a Cloudflare zone-level security-headers transform). That header comes from
-//  the file's own host, so no CSP change here overrides it — it has to be lifted
-//  for that hostname in Cloudflare first. iOS Safari refuses framed PDFs
-//  regardless, which is why the layout below falls back to a link card on small
-//  screens. While this is `false` the section shows that card everywhere, so
-//  the guidelines are always reachable — just not embedded.
-const guidelinesEmbed = false;
+//  If the file is NOT in place, set this to false — the section then shows the
+//  link card everywhere instead of framing a "not found" page. (iOS Safari
+//  refuses framed PDFs whatever we do, which is why the layout falls back to
+//  that same card on small screens regardless.)
+const guidelinesEmbed = true;
 
-// <<PLACEHOLDER>>
 const guidelinesNote = [
-  'Before handing the programme over, I documented the whole system as a brand rulebook: logo construction and clear space, the extended colour palette, type hierarchy, photography direction, and templates for event, print and social assets.',
-  'It exists so the identity survives without me — anyone running a future edition can produce on-brand collateral without redrawing the system from scratch.',
+  'A working rulebook for the 2.0 identity — logo and clear space, colour and gradients, type, and rules for co-branding, social and web — down to a one-page cheat sheet.',
 ];
 
 const tabs = [
@@ -284,8 +285,8 @@ const metaDescription =
     <section class="section uiss__phase" id="uiss-1">
       <div class="wrap">
         <header class="uiss__phase-head">
-          <p class="eyebrow" data-reveal>Phase 01 · UISS 1.0</p>
-          <h2 class="display uiss__phase-title" data-reveal>The launch edition</h2>
+          <p class="eyebrow" data-reveal>Edition 01</p>
+          <h2 class="display uiss__phase-title" data-reveal>UISS 1.0</h2>
         </header>
 
         <figure class="uiss__anchor" data-reveal>
@@ -550,17 +551,7 @@ const metaDescription =
             >
               <span class="magnetic__inner">Visit the live site ↗</span>
             </a>
-            <a
-              class="uiss2__cta uiss2__cta--ghost magnetic"
-              href={guidelinesPdf}
-              target="_blank"
-              rel="noopener"
-              data-cursor="Open"
-            >
-              <span class="magnetic__inner">View brand guidelines ↓</span>
-            </a>
           </div>
-          <p class="uiss2__cta-note" data-reveal>startupseries.ae</p>
         </div>
       </div>
 
@@ -571,7 +562,7 @@ const metaDescription =
         <div class="uiss2__guides-head">
           <div>
             <p class="eyebrow" data-reveal>Brand guidelines</p>
-            <h3 class="display uiss2__guides-title" data-reveal>The rulebook, handed over</h3>
+            <h3 class="display uiss2__guides-title" data-reveal>The working rulebook</h3>
           </div>
           <div class="uiss2__guides-copy">
             {guidelinesNote.map((para) => <p data-reveal>{para}</p>)}
@@ -759,7 +750,7 @@ const metaDescription =
     max-width: 60ch;
   }
 
-  /* ── Phase 01 ───────────────────────────────────────────────────────── */
+  /* ── Edition 01 ───────────────────────────────────────────────────────── */
   .uiss__phase {
     padding-top: 0;
   }
@@ -1147,7 +1138,7 @@ const metaDescription =
     aspect-ratio: 4 / 3;
   }
 
-  /* ── Phase 02 ───────────────────────────────────────────────────────── */
+  /* ── Edition 02 ───────────────────────────────────────────────────────── */
   /* The project accent is a corner glow, not a field: at 30% over 80%×120% it
      washed the whole right half at wide viewports and put a red CTA on a
      purple ground. Tightened and dropped so the accent stays concentrated in
@@ -1200,15 +1191,14 @@ const metaDescription =
     transition: background 0.4s var(--ease), color 0.4s var(--ease),
       border-color 0.4s var(--ease);
   }
-  /* The one action this page is asking for, so it is the one filled button.
-     Elsewhere on the site the pill starts outlined and fills on hover; here
-     that read is inverted, because an outlined primary next to an outlined
-     secondary gave the pair no hierarchy at all. */
-  .uiss2__cta:not(.uiss2__cta--ghost) {
+  /* The one action this section asks for, so it is filled. Elsewhere on the
+     site the pill starts outlined and fills on hover; that read is inverted
+     here so the button carries weight against the copy beside it. */
+  .uiss2__cta {
     background: var(--accent);
     color: #000;
   }
-  .uiss2__cta:not(.uiss2__cta--ghost):hover {
+  .uiss2__cta:hover {
     background: transparent;
     color: var(--fg);
     border-color: var(--fg);
@@ -1216,23 +1206,6 @@ const metaDescription =
   .uiss2__cta:focus-visible {
     outline: 2px solid var(--accent-ink);
     outline-offset: 3px;
-  }
-  /* Secondary action: outline only, so the live-site link keeps priority. */
-  .uiss2__cta--ghost {
-    border-color: var(--line);
-    color: var(--fg-dim);
-  }
-  .uiss2__cta--ghost:hover {
-    color: var(--fg);
-    border-color: var(--fg);
-  }
-  /* Caption for the pair, not a third item in the row — inside the flex row it
-     wrapped onto its own line and read as a broken button. */
-  .uiss2__cta-note {
-    margin-top: 0.9rem;
-    font-size: var(--step--1);
-    color: var(--fg-dim);
-    letter-spacing: 0.04em;
   }
 
   /* Brand guidelines. Head on the shared grid; the document breaks out wide. */
