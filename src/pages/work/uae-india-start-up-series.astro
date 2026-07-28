@@ -566,7 +566,11 @@ const metaDescription =
           </div>
 
           {/* Same card on every viewport — a click just opens the PDF in a new
-              tab. Simpler than an embed, and sidesteps framing/CSP entirely. */}
+              tab. Simpler than an embed, and sidesteps framing/CSP entirely.
+              The label lives in the figcaption, not over the artwork: the cover
+              states the document's title itself, so an overlay sat on top of
+              it and read as duplicated text. `aria-label` carries the full
+              description because the caption is outside the link. */}
           <figure class="uiss2__pdf" data-reveal>
             <a
               class="uiss2__pdf-card"
@@ -574,13 +578,15 @@ const metaDescription =
               target="_blank"
               rel="noopener"
               data-cursor="Open"
+              aria-label="UISS 2.0 Brand Guidelines — PDF, opens in a new tab"
             >
               <img class="uiss2__pdf-card-img" src={guidelinesCover} alt="" loading="lazy" />
               <span class="uiss2__pdf-kind">PDF</span>
-              <span class="uiss2__pdf-name">UISS 2.0 Brand Guidelines</span>
-              <span class="uiss2__pdf-meta">Opens in a new tab</span>
-              <span class="uiss2__pdf-cta">Open the document ↗</span>
             </a>
+            <figcaption>
+              <span class="uiss2__pdf-name">UISS 2.0 Brand Guidelines</span>
+              <span class="uiss2__pdf-cta">Open the document ↗</span>
+            </figcaption>
           </figure>
         </div>
       </div>
@@ -913,7 +919,8 @@ const metaDescription =
   .uiss__shot figcaption,
   .uiss__screen figcaption,
   .uiss__ux-figure figcaption,
-  .uiss__reel figcaption {
+  .uiss__reel figcaption,
+  .uiss2__pdf figcaption {
     font-size: var(--step--1);
     color: var(--fg-dim);
   }
@@ -1196,13 +1203,14 @@ const metaDescription =
   .uiss2__guides {
     margin-top: var(--stack-lg);
   }
-  /* Text column takes whatever space is left; the thumbnail column is bounded
-     so the card reads as a companion to the title, not a second full-width
-     block. `align-items: start` keeps the thumbnail level with the title
-     rather than stretched to the copy's full height. */
+  /* The page's shared grid, so the text column matches the 62ch measure its
+     copy is capped at and the cover takes the wider 1.4fr share — a fixed,
+     narrower thumbnail column left a large dead gap between the two, because
+     the text never grew to fill 1fr. `align-items: start` keeps the cover
+     level with the title instead of stretching to the copy's height. */
   .uiss2__guides-head {
     display: grid;
-    grid-template-columns: 1fr minmax(220px, 340px);
+    grid-template-columns: var(--col);
     align-items: start;
     gap: var(--col-gap);
   }
@@ -1224,22 +1232,17 @@ const metaDescription =
   .uiss2__pdf {
     margin-top: 0;
   }
-  /* Link card, same on every viewport. Built like the doc-cover tile in
-     work/[id].astro: a real page-1 render behind the label, not a plain accent
-     gradient. */
+  /* The cover fills the card edge to edge — nothing sits on top of it but the
+     format badge, so the artwork reads as the document preview it is. No
+     max-height: the 16:9 ratio matches the source deck exactly, and capping
+     the height would squash it on a short window. */
   .uiss2__pdf-card {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    display: block;
     overflow: hidden;
-    /* Matches the source deck (16:9) exactly, so the cover fills the tile with
-       nothing cropped and no letterboxing to account for. */
     aspect-ratio: 16 / 9;
-    max-height: min(70vh, 620px);
-    padding: clamp(1.4rem, 3vw, 2.2rem);
     border-radius: var(--r);
+    /* Shows only until the cover loads, and behind it if the file ever moves. */
     background: linear-gradient(135deg, var(--a), #000 95%);
     color: #f4f0e6;
   }
@@ -1250,58 +1253,42 @@ const metaDescription =
     height: 100%;
     object-fit: cover;
   }
-  /* Scrim, so the label stays legible over whatever the cover's own artwork
-     does at that edge. */
-  .uiss2__pdf-card::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 65%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0));
-    pointer-events: none;
-  }
   .uiss2__pdf-card:focus-visible {
     outline: 2px solid var(--accent-ink);
     outline-offset: -5px;
   }
-  .uiss2__pdf-kind,
-  .uiss2__pdf-name,
-  .uiss2__pdf-meta,
-  .uiss2__pdf-cta {
-    position: relative;
-    z-index: 1;
-  }
+  /* Floats in the cover's top-left corner, on its own plate — the artwork
+     behind it can be any tone. */
   .uiss2__pdf-kind {
+    position: absolute;
+    top: clamp(0.8rem, 1.6vw, 1.2rem);
+    left: clamp(0.8rem, 1.6vw, 1.2rem);
     font-size: var(--step--1);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 0.25em 0.6em;
     border: 1px solid currentColor;
     border-radius: var(--pill);
-    /* The scrim only backs the bottom 65% — the badge sits above that, so it
-       needs its own plate rather than relying on the scrim underneath it. */
     background: rgba(0, 0, 0, 0.55);
-    opacity: 1;
+  }
+  /* Two stacked lines, same shape as the reel captions. */
+  .uiss2__pdf figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-top: 0.8rem;
   }
   .uiss2__pdf-name {
-    margin-top: auto;
-    font-family: var(--font-display);
-    font-weight: 800;
-    text-transform: uppercase;
-    line-height: 1.05;
-    font-size: clamp(1.1rem, 2.2vw, 1.9rem);
-  }
-  .uiss2__pdf-meta {
-    font-size: var(--step--1);
-    opacity: 0.7;
+    font-weight: 500;
+    color: var(--fg);
   }
   .uiss2__pdf-cta {
-    font-size: var(--step--1);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     transition: transform 0.4s var(--ease);
   }
-  .uiss2__pdf-card:hover .uiss2__pdf-cta {
+  /* Nudge follows the card, since the card is what's hovered. */
+  .uiss2__pdf:hover .uiss2__pdf-cta {
     transform: translateX(4px);
   }
 
