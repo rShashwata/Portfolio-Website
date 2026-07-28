@@ -52,15 +52,9 @@ const lede = [
 ];
 
 // TAB 1 — Event Branding. `src: null` → placeholder tile.
+// Order matters: the grid is two-up, so this lays out as centre + ID cards on
+// the first row and the two angle shots beneath them.
 const brandingShots: Shot[] = [
-  {
-    src: '/img/work/uae-india-start-up-series/event-area-angle-shot-1.jpg',
-    caption: 'Event area — angle shot 1',
-  },
-  {
-    src: '/img/work/uae-india-start-up-series/event-area-angle-shot-2.jpg',
-    caption: 'Event area — angle shot 2',
-  },
   {
     src: '/img/work/uae-india-start-up-series/event-area-centre-shot.jpg',
     caption: 'Event area — centre shot',
@@ -68,6 +62,14 @@ const brandingShots: Shot[] = [
   {
     src: '/img/work/uae-india-start-up-series/event-id-cards.jpg',
     caption: 'Event ID cards',
+  },
+  {
+    src: '/img/work/uae-india-start-up-series/event-area-angle-shot-1.jpg',
+    caption: 'Event area — angle shot 1',
+  },
+  {
+    src: '/img/work/uae-india-start-up-series/event-area-angle-shot-2.jpg',
+    caption: 'Event area — angle shot 2',
   },
 ];
 
@@ -291,25 +293,33 @@ const metaDescription =
         </figure>
 
         <!-- Tab bar sits on the image's bottom edge on desktop, below it on
-             mobile. Buttons, not links, so no hash lands in the URL — a
+             mobile, then sticks under the header for the length of this
+             section. Buttons, not links, so no hash lands in the URL — a
              fragment triggers the pre-paint jump handling in theme-init.js,
-             which can't resolve a panel that starts collapsed. -->
-        <div class="uiss__tabs" role="tablist" aria-label="UISS 1.0 workstreams">
-          {
-            tabs.map((t, i) => (
-              <button
-                class:list={['uiss__tab', { 'is-active': i === 0 }]}
-                type="button"
-                role="tab"
-                id={`uiss-tab-${t.key}`}
-                aria-controls={`uiss-panel-${t.key}`}
-                aria-selected={i === 0 ? 'true' : 'false'}
-                data-uiss-tab={t.key}
-              >
-                {t.label}
-              </button>
-            ))
-          }
+             which can't resolve a panel that starts collapsed.
+             The plate and the tablist are separate elements: the sliding fill
+             is a child of the plate, and role="tablist" may only contain tabs. -->
+        <div class="uiss__tabs" data-uiss-tabs>
+          {/* The active tab's fill, moved by main.js. Decorative — the state it
+              shows is already announced by aria-selected on the buttons. */}
+          <span class="uiss__tab-pill" aria-hidden="true" data-uiss-pill></span>
+          <div class="uiss__tablist" role="tablist" aria-label="UISS 1.0 workstreams">
+            {
+              tabs.map((t, i) => (
+                <button
+                  class:list={['uiss__tab', { 'is-active': i === 0 }]}
+                  type="button"
+                  role="tab"
+                  id={`uiss-tab-${t.key}`}
+                  aria-controls={`uiss-panel-${t.key}`}
+                  aria-selected={i === 0 ? 'true' : 'false'}
+                  data-uiss-tab={t.key}
+                >
+                  {t.label}
+                </button>
+              ))
+            }
+          </div>
         </div>
 
         <!-- Panels are collapsed by CSS gated on `html.js` (set before paint in
@@ -318,7 +328,7 @@ const metaDescription =
              Nothing inside a panel carries `data-reveal`: those start at
              opacity 0 and their ScrollTrigger is registered against a
              display:none element, so the content could never fade in. -->
-        <div class="uiss__panels">
+        <div class="uiss__panels" data-uiss-panels>
           <!-- Event Branding -->
           <section
             class="uiss__panel is-active"
@@ -640,6 +650,11 @@ const metaDescription =
        one left edge the whole way down. */
     --col: 1fr 1.4fr;
     --col-gap: clamp(1.5rem, 5vw, 5rem);
+    /* Where the tab bar parks once it sticks: clear of the fixed header in its
+       scrolled state, plus a little air. The header has no fixed height — its
+       padding is fluid — so this tracks the same clamp curve rather than
+       hard-coding a pixel value. */
+    --stick-top: calc(clamp(3.4rem, 5.5vw, 4.4rem) + 0.6rem);
   }
 
   /* ── Hero ───────────────────────────────────────────────────────────── */
@@ -648,7 +663,13 @@ const metaDescription =
     /* Full-bleed: `.wrap` inside handles the max-width, so the image itself
        runs edge to edge under the fixed header. */
     width: 100%;
-    min-height: min(92vh, 900px);
+    /* A full screen, uncapped. `svh` is the viewport at its SMALLEST — mobile
+       browser chrome showing — so the hero is never taller than what's on
+       screen at first paint. `dvh` would resize as the chrome hides on scroll,
+       which reflows the hero mid-scroll; `vh` overshoots on iOS. The plain
+       `vh` line is the fallback for browsers without the newer units. */
+    min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     align-items: flex-end;
     overflow: hidden;
@@ -769,13 +790,17 @@ const metaDescription =
   /* Tab bar: frosted pill row overlapping the anchor image's bottom edge,
      centred on it. It reads as a control belonging to the image rather than as
      page content, which is why it sits centred while the copy below it hangs
-     off the left grid edge. */
+     off the left grid edge.
+
+     `sticky`, not `relative`: the bar follows the reader down the section so a
+     tab can be switched from anywhere inside it. Its containing block is the
+     `.wrap` holding the heading, anchor image and panels, so it releases on its
+     own at the bottom of the panels and scrolls away with the section edge —
+     no JS, and it can never trespass into Edition 02. */
   .uiss__tabs {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    position: sticky;
+    top: var(--stick-top);
+    z-index: 5;
     width: fit-content;
     max-width: 100%;
     margin: -1.6rem auto var(--stack);
@@ -786,7 +811,30 @@ const metaDescription =
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     backdrop-filter: blur(14px) saturate(140%);
   }
+  .uiss__tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  /* The active tab's fill, as one element that slides between tabs instead of
+     a background fading out on one button and in on another. Left unpositioned
+     and transparent until main.js measures a target, so it can't flash at 0,0
+     — and if the bundle never runs, the static `.is-active` fill below stands
+     in (the `.has-pill` class that suppresses it is set by main.js too). */
+  .uiss__tab-pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    border-radius: var(--pill);
+    background: var(--accent);
+    opacity: 0;
+    pointer-events: none;
+  }
   .uiss__tab {
+    /* Above the sliding fill, which is painted at z-index 0 behind the row. */
+    position: relative;
+    z-index: 1;
     /* 48px min target: finger-friendly without a media query. */
     min-height: 48px;
     padding: 0.7rem 1.4rem;
@@ -804,6 +852,11 @@ const metaDescription =
   .uiss__tab.is-active {
     background: var(--accent);
     color: #000;
+  }
+  /* Once the pill is live it owns the fill — leaving the button's own
+     background on would paint the destination before the slide arrived. */
+  .uiss__tabs.has-pill .uiss__tab.is-active {
+    background: transparent;
   }
   /* Keyboard focus must stay visible — the custom cursor hides the OS one. */
   .uiss__tab:focus-visible {
@@ -1353,16 +1406,37 @@ const metaDescription =
       margin-top: var(--stack);
     }
     /* Tab bar clears the image instead of overlapping it — a pill row wrapping
-       to two lines over the photo eats the shot and hurts legibility. */
+       to two lines over the photo eats the shot and hurts legibility.
+
+       It also scrolls sideways as one line rather than wrapping: the bar is
+       sticky for the length of the section, and two rows held ~17% of a phone
+       viewport the whole way down. The scroll container is this element, not
+       the tablist, so the pill — absolutely positioned against it — travels
+       with the tabs and stays under the active one without a scroll handler. */
     .uiss__tabs {
       width: 100%;
-      justify-content: flex-start;
       margin-top: 1rem;
-      border-radius: var(--r);
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      /* The cut-off third tab is the affordance; a bar this short doesn't need
+         a scrollbar drawn over it as well. */
+      scrollbar-width: none;
+    }
+    .uiss__tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .uiss__tablist {
+      flex-wrap: nowrap;
+      /* Sized to its content so the tabs overflow the plate instead of being
+         squeezed into it. The plate's own padding-right is dropped at the end
+         of a scroll container, so the trailing air is re-added here. */
+      width: max-content;
+      padding-right: 0.5rem;
     }
     .uiss__tab {
-      flex: 1 1 auto;
-      text-align: center;
+      flex: 0 0 auto;
       padding-inline: 1rem;
     }
     .uiss__shots {

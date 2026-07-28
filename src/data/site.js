@@ -143,7 +143,7 @@ export const projects = [
   {
     id: 'uae-india-start-up-series',
     no: '01',
-    title: 'UAE India Start-up Series',
+    title: 'UAE-India Start-up Series',
     category: 'Brand Identity',
     cat: 'design',
     type: 'Design · Motion',

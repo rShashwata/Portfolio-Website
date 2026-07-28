@@ -182,6 +182,79 @@ function initUissTabs() {
   const panels = Array.from(document.querySelectorAll('[data-uiss-panel]'));
   if (!tabs.length || !panels.length) return;
 
+  const bar = document.querySelector('[data-uiss-tabs]');
+  const pill = document.querySelector('[data-uiss-pill]');
+  const panelsEl = document.querySelector('[data-uiss-panels]');
+
+  // ── The sliding fill ──────────────────────────────────────────────────
+  //  The target is a flex item that can wrap to a second row on narrow
+  //  viewports, so its box isn't expressible in CSS — measure and move.
+  //  offsetLeft/Top are read against .uiss__tabs (the only positioned
+  //  ancestor, and the pill's containing block), so the two agree.
+  let placed = false;
+  const movePill = (animate = true) => {
+    if (!pill) return;
+    const target = tabs.find((t) => t.classList.contains('is-active'));
+    // No box while the bar is display:none or the text hasn't laid out yet;
+    // bailing leaves the pill hidden rather than collapsing it onto 0,0.
+    if (!target || !target.offsetWidth) return;
+    const box = {
+      x: target.offsetLeft,
+      y: target.offsetTop,
+      width: target.offsetWidth,
+      height: target.offsetHeight,
+      opacity: 1,
+    };
+    // The first placement is a jump, not a slide — there is nowhere to slide
+    // from. After that the tween is the whole point of the element.
+    if (animate && placed && !reduceMotion) {
+      gsap.to(pill, { ...box, duration: 0.45, ease: 'power3.out', overwrite: true });
+    } else {
+      gsap.set(pill, box);
+    }
+    if (!placed) {
+      placed = true;
+      // Hands the fill over from the button's own background to the pill.
+      bar?.classList.add('has-pill');
+    }
+  };
+
+  // On mobile the bar is a horizontal scroller (one line instead of two rows),
+  // so the tab just selected can be sitting half off its edge. Nudged with
+  // scrollLeft rather than scrollIntoView, which would also move the page
+  // vertically while the bar is stuck. No-ops on desktop, where nothing
+  // overflows.
+  const revealTab = (target) => {
+    if (!bar || bar.scrollWidth <= bar.clientWidth) return;
+    const pad = 8;
+    const left = target.offsetLeft - pad;
+    const right = target.offsetLeft + target.offsetWidth + pad;
+    if (left < bar.scrollLeft) bar.scrollLeft = left;
+    else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth;
+  };
+
+  // ── Sticky bar: keep the reader where they were ───────────────────────
+  //  The bar sticks for the length of the section, so a tab can be switched
+  //  from deep inside a panel. The panels differ in height by several screens,
+  //  though, and swapping a tall one for a short one shrinks the page under
+  //  the reader — the browser clamps the scroll and dumps them past the end of
+  //  the section. When the switch was made from the stuck bar, re-anchor to the
+  //  top of the new panel so it starts where the old one was being read.
+  const isStuck = () => {
+    if (!bar) return false;
+    const top = parseFloat(getComputedStyle(bar).top);
+    return Number.isFinite(top) && bar.getBoundingClientRect().top <= top + 1;
+  };
+  const reanchor = () => {
+    if (!bar || !panelsEl) return;
+    const top = parseFloat(getComputedStyle(bar).top) || 0;
+    // Measured after the swap, so these rects already reflect any clamping.
+    const y =
+      panelsEl.getBoundingClientRect().top + window.scrollY - top - bar.offsetHeight - 12;
+    if (lenis) lenis.scrollTo(y, { duration: 0.6 });
+    else window.scrollTo({ top: y, behavior: reduceMotion ? 'auto' : 'smooth' });
+  };
+
   const select = (key, focus = false) => {
     tabs.forEach((tab) => {
       const on = tab.getAttribute('data-uiss-tab') === key;
@@ -189,23 +262,33 @@ function initUissTabs() {
       tab.setAttribute('aria-selected', on ? 'true' : 'false');
       // Roving tabindex: the whole tablist is one tab stop, arrows move within.
       tab.tabIndex = on ? 0 : -1;
-      if (on && focus) tab.focus();
+      if (on) {
+        revealTab(tab);
+        if (focus) tab.focus();
+      }
     });
     panels.forEach((panel) =>
       panel.classList.toggle('is-active', panel.getAttribute('data-uiss-panel') === key)
     );
+    movePill();
     // Panels differ in height, so switching changes the page height — anything
     // below them has stale trigger positions until this runs.
     ScrollTrigger.refresh();
   };
 
   tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => select(tab.getAttribute('data-uiss-tab')));
+    tab.addEventListener('click', () => {
+      const stuck = isStuck();
+      select(tab.getAttribute('data-uiss-tab'));
+      if (stuck) reanchor();
+    });
     tab.addEventListener('keydown', (e) => {
       const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
       if (!step) return;
       e.preventDefault();
+      const stuck = isStuck();
       select(tabs[(i + step + tabs.length) % tabs.length].getAttribute('data-uiss-tab'), true);
+      if (stuck) reanchor();
     });
   });
 
@@ -213,6 +296,15 @@ function initUissTabs() {
   // declared in one place (the page) rather than twice.
   const initial = tabs.find((t) => t.classList.contains('is-active')) || tabs[0];
   select(initial.getAttribute('data-uiss-tab'));
+
+  // The pill's box is in pixels, so it goes stale whenever the labels re-lay
+  // out: the webfont swapping in, or a resize re-wrapping the row.
+  document.fonts?.ready.then(() => movePill(false));
+  let pillTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(pillTimer);
+    pillTimer = setTimeout(() => movePill(false), 150);
+  });
 }
 
 // ── Custom cursor: a dot that trails the pointer + a contextual label ────
