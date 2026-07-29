@@ -149,7 +149,7 @@ export const projects = [
     type: 'Design · Motion',
     year: '2025',
     accent: '#8c00ff',
-    media: '/img/work/uae-india-start-up-series/banner-top-5-scaled.webp',
+    media: '/img/work/uae-india-start-up-series/uiss-1-0-hero-bg.jpg',
     client: 'UAE Embassy in India - CEPA Council',
     role: 'Lead Designer',
     services: ['Brand Identity', 'Logo System', 'Guidelines', 'Motion'],

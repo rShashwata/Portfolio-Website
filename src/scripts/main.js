@@ -307,6 +307,41 @@ function initUissTabs() {
   });
 }
 
+// ── Brand guideline viewers: page through pre-rendered PDF-page images ────
+//  Each `[data-guide-viewer]` runs independently, so the UISS 1.0 and 2.0
+//  decks on the same page don't share state.
+function initGuidelinesViewer() {
+  document.querySelectorAll('[data-guide-viewer]').forEach((viewer) => {
+    const pages = Array.from(viewer.querySelectorAll('[data-guide-page]'));
+    const prev = viewer.querySelector('[data-guide-prev]');
+    const next = viewer.querySelector('[data-guide-next]');
+    const count = viewer.querySelector('[data-guide-count]');
+    if (!pages.length || !prev || !next) return;
+
+    let i = 0;
+    const show = (index) => {
+      i = Math.max(0, Math.min(index, pages.length - 1));
+      pages.forEach((page, n) => page.classList.toggle('is-active', n === i));
+      prev.disabled = i === 0;
+      next.disabled = i === pages.length - 1;
+      if (count) count.textContent = `${i + 1} / ${pages.length}`;
+    };
+
+    prev.addEventListener('click', () => show(i - 1));
+    next.addEventListener('click', () => show(i + 1));
+    show(0);
+
+    // Deters casual "Save Image As" / drag-to-desktop on these specific pages
+    // — a speed bump for the brand decks, not real protection. Anything
+    // rendered on screen can still be screenshotted; this only blocks the
+    // right-click menu and the drag gesture.
+    pages.forEach((page) => {
+      page.addEventListener('contextmenu', (e) => e.preventDefault());
+      page.addEventListener('dragstart', (e) => e.preventDefault());
+    });
+  });
+}
+
 // ── Custom cursor: a dot that trails the pointer + a contextual label ────
 function initCursor() {
   if (isTouch) return;
@@ -1007,6 +1042,7 @@ function init() {
   initFilters();
   initHeroRule();
   initUissTabs();
+  initGuidelinesViewer();
   runPreloader();
 }
 
