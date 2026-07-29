@@ -36,14 +36,18 @@ const tabs = [{ key: 'recent', label: 'Recent' }, ...categories];
               <span class="work__year">{p.year}</span>
             </a>
             {/* Floating thumbnail that follows the cursor on hover.
-                Uses a generated gradient when `media` is null. */}
+                Uses a generated gradient when there's no image at all.
+                Prefers `thumb`: this tile is 4:3 and cover-cropped, so a wide
+                `media` hero loses its outer thirds here — and a subject that
+                isn't vertically centred in it can't be recovered with
+                object-position, since only the width gets cropped. */}
             <div
               class="work__thumb"
               data-work-thumb
               style={`--a:${p.accent}`}
             >
-              {p.media ? (
-                <img src={p.media} alt={p.title} loading="lazy" />
+              {p.thumb || p.media ? (
+                <img src={p.thumb || p.media} alt={p.title} loading="lazy" />
               ) : (
                 <span class="work__thumb-label">{p.title}</span>
               )}

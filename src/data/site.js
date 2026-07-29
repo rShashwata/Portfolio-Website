@@ -63,6 +63,15 @@ export const categories = [
 //      `year`        → year string
 //      `accent`      → hex colour used for the hover tint / placeholder
 //      `media`       → big hero image. null = placeholder.
+//      `thumb`       → OPTIONAL. The 4:3 tile that follows the cursor on the
+//                      home-page work list. Omit it and that tile cover-crops
+//                      `media`, which is fine for a hero whose subject sits in
+//                      the middle. Set it when the subject doesn't survive the
+//                      crop — a wide hero loses its outer thirds to a 4:3 box,
+//                      and anything off-centre VERTICALLY can't be nudged back
+//                      with object-position, because only the width is cropped.
+//                      Export at 800×600 (the tile renders at most 320×240 CSS
+//                      px, so that covers a 2x screen with room to spare).
 //                      Keep project files in /public/img/work/<id>/ so each case
 //                      study owns one folder, e.g. '/img/work/neon-pulse/hero.jpg'
 //                      Same rule for any local (non-R2) document a case study
@@ -149,7 +158,8 @@ export const projects = [
     type: 'Design · Motion',
     year: '2025',
     accent: '#8c00ff',
-    media: '/img/work/uae-india-start-up-series/uiss-1-0-hero-bg.jpg',
+    media: '/img/work/uae-india-start-up-series/uiss-1-0-hero-bg.webp',
+    thumb: '/img/work/uae-india-start-up-series/uiss-1-0-thumb.webp',
     client: 'UAE Embassy in India - CEPA Council',
     role: 'Lead Designer',
     services: ['Brand Identity', 'Logo System', 'Guidelines', 'Motion'],

@@ -142,36 +142,6 @@ function initFilters() {
   applyFilter(initial.getAttribute('data-filter'), false);
 }
 
-// ── Case-study hero: match the meta rule to the title's first line ───────
-//  A wrapped line's width isn't expressible in CSS, so measure it. A Range
-//  over the heading returns one rect per rendered line — the first is the one
-//  the rule aligns to. Same technique as the hero underline in
-//  initRoleRotator, and re-run for the same reasons: the width is in pixels,
-//  so it goes stale when the webfont swaps in or the vw-driven size changes.
-function initHeroRule() {
-  const title = document.querySelector('[data-hero-rule-from]');
-  const rule = document.querySelector('[data-hero-rule]');
-  if (!title || !rule) return;
-
-  const measure = () => {
-    const range = document.createRange();
-    range.selectNodeContents(title);
-    const firstLine = range.getClientRects()[0];
-    // No rects while the element is display:none or the text hasn't laid out;
-    // leaving --rule-w unset keeps the CSS fallback rather than collapsing it.
-    if (!firstLine || !firstLine.width) return;
-    rule.style.setProperty('--rule-w', Math.round(firstLine.width) + 'px');
-  };
-
-  measure();
-  document.fonts?.ready.then(measure);
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(measure, 200);
-  });
-}
-
 // ── Tabbed panels on the bespoke UISS case study ─────────────────────────
 //  Lives here rather than in a <script> on the page: a small page-level module
 //  gets inlined into the HTML at build time, and the CSP in public/_headers
@@ -334,7 +304,10 @@ function initGuidelinesViewer() {
     // Deters casual "Save Image As" / drag-to-desktop on these specific pages
     // — a speed bump for the brand decks, not real protection. Anything
     // rendered on screen can still be screenshotted; this only blocks the
-    // right-click menu and the drag gesture.
+    // right-click menu and the drag gesture. Opt-in, because the same viewer
+    // also runs the event-photo carousel, where suppressing right-click is
+    // just an unexplained dead menu.
+    if (!viewer.hasAttribute('data-guide-protect')) return;
     pages.forEach((page) => {
       page.addEventListener('contextmenu', (e) => e.preventDefault());
       page.addEventListener('dragstart', (e) => e.preventDefault());
@@ -1040,7 +1013,6 @@ function init() {
   initCursor();
   initMagnetic();
   initFilters();
-  initHeroRule();
   initUissTabs();
   initGuidelinesViewer();
   runPreloader();

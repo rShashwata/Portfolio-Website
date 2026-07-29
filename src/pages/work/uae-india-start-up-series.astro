@@ -44,12 +44,12 @@ const next = projects[(index + 1) % projects.length];
 
 // Page-level lede.
 const lede = [
-  'The UAE-India Start-Up Series is a flagship cross-border start-up platform run under the CEPA framework — a pitch stage where founders from the Indian market meet investors, regulators and embassy leadership in the same room, to get the opportunity to get funding and incubation assistance in the UAE market, to help them scale their brand on a global stage.',
+  'The UAE-India Start-Up Series (UISS) is a flagship cross-border start-up platform run under the CEPA framework - a pitch stage where founders from the Indian market meet investors, regulators and embassy leadership in the same room, to get the opportunity to get funding and incubation assistance in the UAE market, to help them scale their brand on a global stage.',
 ];
 
 // TAB 1 — Event Branding. `src: null` → placeholder tile.
-// Order matters: the grid is two-up, so this lays out as centre + ID cards on
-// the first row and the two angle shots beneath them.
+// All six share one paged frame, so this is the order the arrows step through
+// — first entry is what the panel opens on.
 const brandingShots: Shot[] = [
   {
     src: '/img/work/uae-india-start-up-series/event-area-centre-shot.jpg',
@@ -66,6 +66,14 @@ const brandingShots: Shot[] = [
   {
     src: '/img/work/uae-india-start-up-series/event-area-angle-shot-2.jpg',
     caption: 'Event area — angle shot 2',
+  },
+  {
+    src: '/img/work/uae-india-start-up-series/event-branding/speaker-on-stage.webp',
+    caption: 'Speaker on stage',
+  },
+  {
+    src: '/img/work/uae-india-start-up-series/event-branding/audience-view.webp',
+    caption: 'Audience view',
   },
 ];
 
@@ -239,13 +247,31 @@ type Guidelines = {
   aspect: string; // CSS aspect-ratio value, matches the source deck's page ratio
 };
 
+// ── TAB 1, first segment — the route that didn't ship ─────────────────────
+//  Sits above the guidelines block, so the panel reads: the search, then the
+//  thing that was found, then what was built with it. Same `Guidelines` shape
+//  as the two decks below, and rendered from a PDF the same way — see the type
+//  for the tools/pdf-pages.py command.
+const process1: Guidelines = {
+  eyebrow: 'Process',
+  title: 'Finding the mark',
+  body: [
+    'The brief was one line: keep it simple. The Series puts Indian founders in front of UAE investors and incubators under the CEPA framework, and the identity had to hold on an embassy stage, in a pitch deck and on a phone screen alike.',
+    'The first route went the other way entirely. I built it out of the architecture the two countries share — the pointed arch, paisley, Arabic letterforms — over fluted-glass gradients in bronze, indigo and purple. It looked good and said the wrong thing: heritage and hospitality rather than founders and funding. It was also all surface. Every variant needed a full-bleed gradient behind it to work at all, and none of it survived being scaled down to a badge.',
+    'What carried forward was the one structural idea underneath the ornament: lines converging on a point. Stripped of everything else, that became the four-arrow mark.',
+  ],
+  pages: Array.from(
+    { length: 7 },
+    (_, i) => `/img/work/${ID}/rough-work/page-${String(i + 1).padStart(2, '0')}.jpg`
+  ),
+  aspect: '16 / 9',
+};
+
 const guidelines1: Guidelines = {
   eyebrow: 'Brand guidelines',
   title: 'The launch identity',
   body: [
-    'The identity is built from a single mark: four arrows meeting at a point, one held back in a lighter tint to break the symmetry so the glyph reads as forward motion rather than a static cross.',
-    'Tomato Orange and Steel Blue carry the palette as a blended gradient field rather than flat colour, set against Poppins running the full type system — a Light display weight down to SemiBold labels and captions.',
-    'The mark’s geometry repeats into a line pattern and a small icon set for partnership, pitching and recognition, then scales up to the stage backdrop the launch event itself was staged against.',
+    'The identity is built from a single mark: four arrows around a shared centre. Three point inward — the programme, its partners and its investors converging on one founder — while the fourth breaks outward in a lighter tint, carrying the start-up up and out. Everything arrives so that one thing can launch.',
   ],
   pages: Array.from(
     { length: 8 },
@@ -256,7 +282,7 @@ const guidelines1: Guidelines = {
 
 const guidelines2: Guidelines = {
   eyebrow: 'Brand guidelines',
-  title: 'The working rulebook',
+  title: '2.0 rulebook',
   body: [
     'A working rulebook for the identity of the upcoming UISS 2.0 — logo and clear space, colour and gradients, type, and rules for co-branding, social and web.',
   ],
@@ -266,6 +292,17 @@ const guidelines2: Guidelines = {
   ),
   aspect: '16 / 9',
 };
+
+// Paging arrows for the three image viewers on this page. SVG rather than the
+// ‹ › characters those buttons used to hold: a glyph is positioned by its font
+// metrics, not by its ink, so `place-items: center` was centring the em box
+// while the visible arrow sat high and slightly off to one side inside it. Each
+// path's bounding box is 9→15 on a 24 viewBox, i.e. centred by construction, so
+// the arrow lands on the circle's centre in any font at any size.
+const arrow = (d: string) =>
+  `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+const ARROW_PREV = arrow('M15 5 9 12l6 7');
+const ARROW_NEXT = arrow('M9 5l6 7-6 7');
 
 const tabs = [
   { key: 'branding', label: 'Branding' },
@@ -291,8 +328,8 @@ const metaDescription =
       <div class="hero-uiss__inner">
         <div class="wrap">
           <p class="hero-uiss__eyebrow" data-reveal>{project.category}</p>
-          <h1 class="display hero-uiss__title" data-reveal data-hero-rule-from>{project.title}</h1>
-          <ul class="hero-uiss__meta" data-hero-rule>
+          <h1 class="display hero-uiss__title" data-reveal>{project.title}</h1>
+          <ul class="hero-uiss__meta">
             <li data-reveal><span class="hero-uiss__k">Client</span>{project.client}</li>
             <li data-reveal><span class="hero-uiss__k">Year</span>{project.year}</li>
           </ul>
@@ -368,10 +405,65 @@ const metaDescription =
             data-uiss-panel="branding"
             tabindex="0"
           >
+            <!-- Process — the route that didn't ship. Same text-left /
+                 frame-right shape and the same paged deck viewer as the
+                 guidelines block below it; these are rendered slides, so the
+                 frame carries their 16:9 ratio and nothing is cropped. -->
+            <div class="uiss__guides" data-reveal>
+              <div class="uiss__guides-head">
+                <div class="uiss__guides-text">
+                  <p class="eyebrow">{process1.eyebrow}</p>
+                  <h3 class="display uiss__guides-title">{process1.title}</h3>
+                  <div class="uiss__guides-copy">
+                    {process1.body.map((para) => <p>{para}</p>)}
+                  </div>
+                </div>
+
+                <figure
+                  class="uiss__guide-viewer"
+                  data-guide-viewer
+                  data-guide-protect
+                  style={`--ar:${process1.aspect}`}
+                >
+                  <div class="uiss__guide-frame">
+                    {
+                      process1.pages.map((src, i) => (
+                        <img
+                          class:list={['uiss__guide-page', { 'is-active': i === 0 }]}
+                          data-guide-page
+                          src={src}
+                          alt={`${process1.title} — rough work, page ${i + 1} of ${process1.pages.length}`}
+                          loading={i === 0 ? 'eager' : 'lazy'}
+                        />
+                      ))
+                    }
+                  </div>
+                  <div class="uiss__guide-controls">
+                    <button
+                      type="button"
+                      class="uiss__guide-btn"
+                      data-guide-prev
+                      aria-label="Previous page"
+                      disabled
+                      set:html={ARROW_PREV}
+                    />
+                    <span class="uiss__guide-count" data-guide-count>{`1 / ${process1.pages.length}`}</span>
+                    <button
+                      type="button"
+                      class="uiss__guide-btn"
+                      data-guide-next
+                      aria-label="Next page"
+                      set:html={ARROW_NEXT}
+                    />
+                  </div>
+                </figure>
+              </div>
+            </div>
+
             <!-- Brand guidelines — paged image viewer, no PDF link. See the
-                 `Guidelines` type above for why. Lives at the top of this
-                 panel rather than above the tab bar, so it's under "Branding"
-                 specifically instead of always visible regardless of tab. -->
+                 `Guidelines` type above for why. Lives inside this panel rather
+                 than above the tab bar, so it's under "Branding" specifically
+                 instead of always visible regardless of tab. -->
             <div class="uiss__guides" data-reveal>
               <div class="uiss__guides-head">
                 <div class="uiss__guides-text">
@@ -382,7 +474,12 @@ const metaDescription =
                   </div>
                 </div>
 
-                <figure class="uiss__guide-viewer" data-guide-viewer style={`--ar:${guidelines1.aspect}`}>
+                <figure
+                  class="uiss__guide-viewer"
+                  data-guide-viewer
+                  data-guide-protect
+                  style={`--ar:${guidelines1.aspect}`}
+                >
                   <div class="uiss__guide-frame">
                     {
                       guidelines1.pages.map((src, i) => (
@@ -403,53 +500,90 @@ const metaDescription =
                       data-guide-prev
                       aria-label="Previous page"
                       disabled
-                    >
-                      ‹
-                    </button>
+                      set:html={ARROW_PREV}
+                    />
                     <span class="uiss__guide-count" data-guide-count>{`1 / ${guidelines1.pages.length}`}</span>
-                    <button type="button" class="uiss__guide-btn" data-guide-next aria-label="Next page">
-                      ›
-                    </button>
+                    <button
+                      type="button"
+                      class="uiss__guide-btn"
+                      data-guide-next
+                      aria-label="Next page"
+                      set:html={ARROW_NEXT}
+                    />
                   </div>
                 </figure>
               </div>
             </div>
 
-            <div class="uiss__panel-copy">
-              <h3 class="uiss__panel-title display">Event Branding</h3>
-              {/* <<PLACEHOLDER>> */}
-              <p>
-                The launch event set the template for everything after it: a stage identity, signage
-                system and delegate collateral built for a room holding embassy leadership,
-                ministry officials and founders at the same time.
-              </p>
-              <p>
-                Most of the work was navigating approvals rather than drawing — every asset carrying
-                the Embassy mark cleared protocol review, so the system was designed to survive
-                changes late: fixed lockup zones, one type hierarchy, colour that held up in print
-                and on an LED wall.
-              </p>
-              <p>
-                Turnarounds ran in hours, not days. Speaker lists moved the morning of the event, so
-                backdrop and screen assets were built as templates I could re-export on site.
-              </p>
-            </div>
+            <!-- Copy left, one paged photo frame right — the page's shared
+                 grid, so this row lines up with the guidelines block above it.
+                 The frame runs on the same `data-guide-*` viewer as the two
+                 brand decks; it just isn't marked `data-guide-protect`, since
+                 these are event photos rather than the licensed deck pages. -->
+            <div class="uiss__brand-grid">
+              <div class="uiss__panel-copy">
+                <h3 class="uiss__panel-title display">Event Branding</h3>
+                {/* <<PLACEHOLDER>> */}
+                <p>
+                  The launch event set the template for everything after it: a stage identity,
+                  signage system and delegate collateral built for a room holding embassy
+                  leadership, ministry officials and founders at the same time.
+                </p>
+                <p>
+                  Most of the work was navigating approvals rather than drawing — every asset
+                  carrying the Embassy mark cleared protocol review, so the system was designed to
+                  survive changes late: fixed lockup zones, one type hierarchy, colour that held up
+                  in print and on an LED wall.
+                </p>
+                <p>
+                  Turnarounds ran in hours, not days. Speaker lists moved the morning of the event,
+                  so backdrop and screen assets were built as templates I could re-export on site.
+                </p>
+              </div>
 
-            <div class="uiss__shots">
-              {
-                brandingShots.map((shot) => (
-                  <figure class="uiss__shot">
-                    {shot.src ? (
-                      <img src={shot.src} alt={shot.caption} loading="lazy" />
-                    ) : (
-                      <span class="uiss__ph">
-                        <span>Image coming soon</span>
-                      </span>
-                    )}
-                    <figcaption>{shot.caption}</figcaption>
-                  </figure>
-                ))
-              }
+              <div class="uiss__shot-viewer" data-guide-viewer>
+                <div class="uiss__shot-frame">
+                  {
+                    brandingShots.map((shot, i) => (
+                      <figure
+                        class:list={['uiss__shot-slide', { 'is-active': i === 0 }]}
+                        data-guide-page
+                      >
+                        {shot.src ? (
+                          <img
+                            src={shot.src}
+                            alt={shot.caption}
+                            loading={i === 0 ? 'eager' : 'lazy'}
+                          />
+                        ) : (
+                          <span class="uiss__ph">
+                            <span>Image coming soon</span>
+                          </span>
+                        )}
+                        <figcaption class="uiss__shot-cap">{shot.caption}</figcaption>
+                      </figure>
+                    ))
+                  }
+                </div>
+                <div class="uiss__guide-controls">
+                  <button
+                    type="button"
+                    class="uiss__guide-btn"
+                    data-guide-prev
+                    aria-label="Previous photo"
+                    disabled
+                    set:html={ARROW_PREV}
+                  />
+                  <span class="uiss__guide-count" data-guide-count>{`1 / ${brandingShots.length}`}</span>
+                  <button
+                    type="button"
+                    class="uiss__guide-btn"
+                    data-guide-next
+                    aria-label="Next photo"
+                    set:html={ARROW_NEXT}
+                  />
+                </div>
+              </div>
             </div>
           </section>
 
@@ -633,7 +767,7 @@ const metaDescription =
               rel="noopener noreferrer nofollow"
               data-cursor="Visit"
             >
-              <span class="magnetic__inner">Visit the live site ↗</span>
+              <span class="magnetic__inner">Visit the Official Site ↗</span>
             </a>
           </div>
         </div>
@@ -652,7 +786,13 @@ const metaDescription =
             </div>
           </div>
 
-          <figure class="uiss__guide-viewer" data-reveal data-guide-viewer style={`--ar:${guidelines2.aspect}`}>
+          <figure
+            class="uiss__guide-viewer"
+            data-reveal
+            data-guide-viewer
+            data-guide-protect
+            style={`--ar:${guidelines2.aspect}`}
+          >
             <div class="uiss__guide-frame">
               {
                 guidelines2.pages.map((src, i) => (
@@ -673,13 +813,16 @@ const metaDescription =
                 data-guide-prev
                 aria-label="Previous page"
                 disabled
-              >
-                ‹
-              </button>
+                set:html={ARROW_PREV}
+              />
               <span class="uiss__guide-count" data-guide-count>{`1 / ${guidelines2.pages.length}`}</span>
-              <button type="button" class="uiss__guide-btn" data-guide-next aria-label="Next page">
-                ›
-              </button>
+              <button
+                type="button"
+                class="uiss__guide-btn"
+                data-guide-next
+                aria-label="Next page"
+                set:html={ARROW_NEXT}
+              />
             </div>
           </figure>
         </div>
@@ -794,23 +937,27 @@ const metaDescription =
     text-transform: uppercase;
     color: rgba(244, 240, 230, 0.72);
   }
+  /* Sized to sit on ONE line for as long as the column can hold it. The vw
+     term is what does that: the column is the viewport less 2x --pad, and --pad
+     is 5vw through the middle of the range, so 90% of the viewport has to fit
+     the 24 glyphs of the title. The cap is the same sum against the widest the
+     column ever gets — .wrap stops at --maxw (1600px), so past a 1600px
+     viewport the text would keep growing while its container didn't, and wrap.
+     Below ~640px the `min` takes over and it wraps, which is intended: one
+     line on a phone would mean an unreadably small display face. */
   .hero-uiss__title {
-    font-size: clamp(2.4rem, 8vw, 7.5rem);
+    font-size: clamp(2.4rem, 6.7vw, 6.6rem);
     margin: 0.18em 0 0.5em;
-    max-width: 18ch;
   }
-  /* The rule stops where the title's first line does. That width is only known
-     once the text has wrapped, so main.js measures it (`initHeroRule`) and
-     writes it to --rule-w. The fallback is the content-width rule, which is
-     what a no-JS visitor gets and what shows for the frame before the webfont
-     settles — never a full-viewport hairline over two short values. */
+  /* Full column width, to the right margin. It used to stop at the title's
+     first line — measured in JS, since a wrapped line's width isn't expressible
+     in CSS — which only read as deliberate while the title wrapped. */
   .hero-uiss__meta {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem clamp(2.5rem, 6vw, 5rem);
-    width: var(--rule-w, min(100%, 20rem));
-    max-width: 100%;
+    width: 100%;
     border-top: 1px solid rgba(244, 240, 230, 0.28);
     padding-top: clamp(1rem, 2.5vh, 1.5rem);
   }
@@ -846,8 +993,39 @@ const metaDescription =
   }
 
   /* ── Edition 01 ───────────────────────────────────────────────────────── */
+  /* A tomato wash off the top-left corner, gone by the time the tab bar starts.
+     Painted as the section's own background rather than a positioned ::before,
+     which would need a negative z-index to stay behind the copy and would then
+     escape this section's stacking context.
+
+     `background-size` caps the band in pixels: the section runs several screens
+     tall (the panels live inside it), so a percentage-based gradient would tint
+     the whole thing. 560px is the measured distance from the section's top edge
+     to the tab bar — the section's own top padding, the intro grid, and the
+     grid's --stack margin — rounded up past its widest reading across eleven
+     viewports (452px to 529px). Flat rather than a vh clamp: what moves that
+     distance is how the intro copy wraps, which tracks viewport *width*, and
+     the whole spread is under 80px either way. The radial's own falloff dies
+     well before the band edge, so overshooting is invisible, where a short band
+     would leave a hard stop above the pill.
+
+     Fading to `transparent` rather than to white, so the same rule reads as
+     "fades to white" in light mode and "fades to the dark ground" in dark. */
   .uiss__phase {
-    padding-top: 0;
+    background-image: radial-gradient(
+      75% 100% at 0% 0%,
+      color-mix(in srgb, #e24131 20%, transparent),
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-size: 100% 560px;
+    /* The section's closing space is moved INSIDE .uiss__panels — see the rule
+       below. It can't sit here or on .wrap, because a sticky element is
+       released by its containing block's CONTENT box: padding on either would
+       leave the tab bar letting go early, with the last stretch of the section
+       scrolling past with no bar on it. */
+    padding-bottom: 0;
   }
   /* Same title/copy grid as UISS 2.0's intro — see `--col` in the page tokens. */
   .uiss__phase-grid {
@@ -872,7 +1050,10 @@ const metaDescription =
     line-height: 1.4;
     max-width: 60ch;
   }
-  /* Tab bar: frosted pill row, left-aligned with the title/copy above it.
+  /* Tab bar: frosted pill row, centred in the column. `width: fit-content` +
+     `auto` side margins rather than a flex/grid centre — the bar is a sticky
+     block, and shrink-to-fit is what keeps the plate hugging the three tabs
+     instead of stretching the full width.
 
      `sticky`, not `relative`: the bar follows the reader down the section so a
      tab can be switched from anywhere inside it. Its containing block is the
@@ -885,7 +1066,11 @@ const metaDescription =
     z-index: 5;
     width: fit-content;
     max-width: 100%;
-    margin: 0 0 var(--stack);
+    /* No bottom margin: a sticky element's MARGIN box is what gets clamped to
+       the containing block, so any margin here would park the bar that far
+       short of Edition 02's border. The gap below the bar is .uiss__panels'
+       padding-top instead — same pixels, on the other side of the boundary. */
+    margin: 0 auto;
     padding: 0.5rem;
     border: 1px solid var(--line);
     border-radius: var(--pill);
@@ -931,9 +1116,11 @@ const metaDescription =
   .uiss__tab:hover {
     color: var(--fg);
   }
+  /* White, not black: --accent is a deep red in both themes, so the label is
+     reading on red here rather than on the lime the token was named for. */
   .uiss__tab.is-active {
     background: var(--accent);
-    color: #000;
+    color: #fff;
   }
   /* Once the pill is live it owns the fill — leaving the button's own
      background on would paint the destination before the slide arrived. */
@@ -944,6 +1131,18 @@ const metaDescription =
   .uiss__tab:focus-visible {
     outline: 2px solid var(--accent-ink);
     outline-offset: 2px;
+  }
+
+  /* Carries the spacing on both sides of the panel stack: the gap under the tab
+     bar, and the section's closing space. Both are padding on this element
+     rather than margins on its neighbours because it is the sticky bar's
+     last sibling — the bar is clamped to the content box of .wrap, so this
+     element's border box is what decides where the bar lets go. Padding here
+     is inside that box and extends the stick; a margin here, or padding on
+     .wrap or the section, sits outside it and doesn't. */
+  .uiss__panels {
+    padding-top: var(--stack);
+    padding-bottom: clamp(5rem, 12vh, 11rem);
   }
 
   /* Panels. Collapsed only when JS is running, so no-JS gets all three. */
@@ -991,7 +1190,6 @@ const metaDescription =
      its natural ratio instead fixed the cropping but left the grids ragged,
      with captions at different heights. So the slot keeps its ratio and the
      image sits inside it whole, on a quiet plate that fills the remainder. */
-  .uiss__shot img,
   .uiss__screen img,
   .uiss__ux-figure img {
     width: 100%;
@@ -1027,31 +1225,58 @@ const metaDescription =
     opacity: 0.8;
   }
 
-  /* Event Branding: image grid with captions. Items align to the top rather
-     than stretching, since uncropped images no longer share a height. */
-  .uiss__shots {
-    margin-top: var(--stack);
+  /* Event Branding: copy left, one paged photo frame right, on the page's
+     shared grid so the row lines up with the guidelines block above it.
+     Ruled off from the Launch Identity block above with the same hairline the
+     home-page work rows and the UX blocks below use — `.uiss__guides` already
+     carries --stack-lg beneath it, so the line sits centred in its own air. */
+  .uiss__brand-grid {
+    padding-top: var(--stack-lg);
+    border-top: 1px solid var(--line);
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: var(--col);
     align-items: start;
-    gap: var(--gap);
+    gap: var(--col-gap);
   }
-  .uiss__shot {
+  /* Only relevant without JS, where all four slides stack instead of paging. */
+  .uiss__shot-frame {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
   }
-  /* 3:2 rather than 4:3 — it's what most of the event photography already is,
-     so the plate barely shows. */
-  .uiss__shot :is(img, .uiss__ph) {
+  .uiss__shot-slide {
+    position: relative;
+  }
+  /* One fixed box for all four, so the frame doesn't resize as the arrows step
+     through. `cover` here rather than the `contain` the other media slots use:
+     every branding photo is exactly 3:2, so a 3:2 frame crops nothing, and the
+     overlaid caption needs a box that's actually filled to sit on. */
+  .uiss__shot-slide :is(img, .uiss__ph) {
+    width: 100%;
     aspect-ratio: 3 / 2;
+    border-radius: var(--r);
+    object-fit: cover;
+    background: var(--bg-soft);
+  }
+  /* Caption over the photo, not under it — otherwise a one- or two-line caption
+     changes the height of the whole frame between slides. Light ink on its own
+     scrim, fixed in both themes: it sits on a photo, not on --bg. */
+  .uiss__shot-cap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 2.4rem 1rem 0.9rem;
+    border-radius: 0 0 var(--r) var(--r);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent);
+    color: #f4f0e6;
+    font-size: var(--step--1);
   }
 
   /* Promotional Content: vertical 9:16 players, height-capped. Both dimensions
      are stated rather than left to aspect-ratio, which would resolve against
      the column width and overflow on wide viewports. */
   /* One caption treatment for every media type on the page. */
-  .uiss__shot figcaption,
   .uiss__screen figcaption,
   .uiss__ux-figure figcaption,
   .uiss__reel figcaption {
@@ -1264,19 +1489,24 @@ const metaDescription =
   }
 
   /* ── Edition 02 ───────────────────────────────────────────────────────── */
-  /* The project accent is a corner glow, not a field: at 30% over 80%×120% it
-     washed the whole right half at wide viewports and put a red CTA on a
-     purple ground. Tightened and dropped so the accent stays concentrated in
-     the document tile below, which is the one object that should carry it. */
+  /* The mirror of Edition 01's opener: same corner, same geometry, same band
+     height — the 2.0 identity's blue where 1.0 gets tomato. Deliberately NOT
+     var(--a): the project accent is violet, and as a glow it tinted the whole
+     top of the section and put the CTA on a purple ground.
+     The ground is now plain --bg rather than --bg-soft, so the wash fades to
+     white in light mode; the border-top above still marks where the section
+     starts. Band capped in pixels for the same reason as Edition 01 — the
+     section is several screens tall, so a percentage would tint all of it. */
   .uiss2 {
     border-top: 1px solid var(--line);
-    background:
-      radial-gradient(
-        55% 85% at 100% 0%,
-        color-mix(in srgb, var(--a) 16%, transparent),
-        transparent 68%
-      ),
-      var(--bg-soft);
+    background-image: radial-gradient(
+      75% 100% at 0% 0%,
+      color-mix(in srgb, #265eff 20%, transparent),
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-size: 100% 560px;
   }
   .uiss2__grid {
     display: grid;
@@ -1326,7 +1556,7 @@ const metaDescription =
      here so the button carries weight against the copy beside it. */
   .uiss2__cta {
     background: var(--accent);
-    color: #000;
+    color: #fff;
   }
   .uiss2__cta:hover {
     background: transparent;
@@ -1338,13 +1568,20 @@ const metaDescription =
     outline-offset: 3px;
   }
 
-  /* Brand guidelines. Shared between UISS 1.0 (first child of the "Branding"
-     tab panel — no top margin, or it'd collapse straight through the panel
-     and misplace the gap above the tab bar instead) and UISS 2.0 (its own
-     `.wrap`, spaced from `.uiss2__grid`'s margin-bottom above it). Head on
-     the shared grid; the viewer breaks out wide. */
+  /* The text-left / frame-right segment block. Used three times: the Process
+     and Brand guidelines segments inside the "Branding" tab panel, and the
+     guidelines block in UISS 2.0. No top margin on the first one, or it'd
+     collapse straight through the panel and misplace the gap above the tab bar
+     instead. Head on the shared grid; the viewer breaks out wide. */
   .uiss__guides {
     margin-bottom: var(--stack-lg);
+  }
+  /* Divider between consecutive segments — the same hairline the Event Branding
+     block below and the home-page work rows use. Adjacent-sibling, so only the
+     second segment onward is ruled, and UISS 2.0's lone block is untouched. */
+  .uiss__guides + .uiss__guides {
+    padding-top: var(--stack-lg);
+    border-top: 1px solid var(--line);
   }
   /* The page's shared grid, so the text column matches the 62ch measure its
      copy is capped at and the viewer takes the wider 1.4fr share — a fixed,
@@ -1369,11 +1606,16 @@ const metaDescription =
     max-width: 62ch;
     color: var(--fg-dim);
   }
-  /* No top margin here: on desktop the viewer sits beside the title, level
-     with it, not below the write-up — the mobile media query re-adds the gap
-     once this collapses to a single stacked column. */
+  /* Optically levelled with the eyebrow beside it, not box-levelled. The grid
+     already starts both columns on the same line (align-items: start), but the
+     eyebrow's first 5px are invisible — half its leading ((1.5em - 1em) / 2 =
+     0.25em) plus the gap from the em box to the cap line (~0.08em) — so a frame
+     whose edge is real ink read as sitting high. 0.33em of --step--1 is that
+     measured 5px, written against the eyebrow's own token so it keeps up as the
+     type scales. The mobile query overrides this with the full stack gap, where
+     the viewer drops below the write-up instead of sitting beside it. */
   .uiss__guide-viewer {
-    margin-top: 0;
+    margin-top: calc(var(--step--1) * 0.33);
   }
   /* One page visible at a time (JS), or all of them stacked (no-JS — see the
      `html.js` rule below). Each page reserves its own box via `--ar`, matching
@@ -1398,7 +1640,9 @@ const metaDescription =
     -webkit-user-drag: none;
     user-select: none;
   }
-  html.js .uiss__guide-page:not(.is-active) {
+  /* Keyed off the attribute, not the class, so both viewers this page runs —
+     the brand decks and the branding photo carousel — page with one rule. */
+  html.js [data-guide-page]:not(.is-active) {
     display: none;
   }
   /* Prev / next / page count, centred under the frame. */
@@ -1416,8 +1660,6 @@ const metaDescription =
     height: 40px;
     border: 1px solid var(--line);
     border-radius: 50%;
-    font-size: var(--step-1);
-    line-height: 1;
     color: var(--fg);
     touch-action: manipulation;
     transition: background 0.3s var(--ease), color 0.3s var(--ease),
@@ -1427,6 +1669,12 @@ const metaDescription =
     background: var(--accent);
     border-color: var(--accent);
     color: #000;
+  }
+  /* `block` so the svg isn't sitting on a text baseline inside the grid cell —
+     an inline replaced element reserves descender space below itself, which is
+     what pushed the old glyph off the circle's centre. */
+  .uiss__guide-btn svg {
+    display: block;
   }
   .uiss__guide-btn:disabled {
     opacity: 0.35;
@@ -1453,6 +1701,7 @@ const metaDescription =
     display: block;
     border-top: 1px solid var(--line);
     padding: clamp(3rem, 10vh, 7rem) 0;
+    background: var(--bg-soft);
     transition: background 0.5s var(--ease);
   }
   .uiss__next:hover {
@@ -1493,31 +1742,40 @@ const metaDescription =
     .uiss2__grid,
     .uiss__phase-grid,
     .uiss__guides-head,
+    .uiss__brand-grid,
     .uiss__ux-block {
       grid-template-columns: 1fr;
     }
     .uiss__lede-grid,
     .uiss2__grid,
     .uiss__phase-grid,
-    .uiss__guides-head {
+    .uiss__guides-head,
+    .uiss__brand-grid {
       gap: 1.2rem;
     }
     .uiss__ux-block {
       gap: 0.8rem;
     }
-    /* Restore the gap the desktop rule zeroed out — collapsed to one column,
-       the viewer is back below the write-up rather than beside the title. */
+    /* Replaces the desktop optical nudge — collapsed to one column, the viewer
+       is back below the write-up rather than beside the title. */
     .uiss__guide-viewer {
       margin-top: var(--stack);
     }
-    /* Full-width scroller rather than a wrapping row — a pill row wrapping to
-       two lines would hold ~17% of a phone viewport the whole way down, since
-       the bar is sticky for the length of the section. The scroll container is
-       this element, not the tablist, so the pill — absolutely positioned
-       against it — travels with the tabs and stays under the active one
-       without a scroll handler. */
+    /* Scroller rather than a wrapping row — a pill row wrapping to two lines
+       would hold ~17% of a phone viewport the whole way down, since the bar is
+       sticky for the length of the section. The scroll container is this
+       element, not the tablist, so the pill — absolutely positioned against it
+       — travels with the tabs and stays under the active one without a scroll
+       handler.
+
+       No `width: 100%` here: the base rule's `fit-content` + `max-width: 100%`
+       is what makes this behave at every width. A scroll container's
+       min-content is 0, so fit-content resolves to the tabs' own width while
+       they fit — a stretched plate with the tabs huddled at one end, which is
+       what a flat 100% gave between roughly 700 and 820px — and clamps to the
+       column only once they genuinely overflow, which is when scrolling is
+       wanted. */
     .uiss__tabs {
-      width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
       overscroll-behavior-x: contain;
@@ -1544,9 +1802,6 @@ const metaDescription =
     .uiss__tab {
       flex: 0 0 auto;
       padding-inline: 1rem;
-    }
-    .uiss__shots {
-      grid-template-columns: 1fr;
     }
     .uiss__reels {
       --reel-h: min(64vh, 520px);
