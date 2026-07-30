@@ -180,30 +180,41 @@ export const projects = [
     ],
   },
   {
-    id: 'monolith',
+    // Bespoke page — see the `bespoke` list in src/pages/work/[id].astro.
+    // This project has no templated case-study page of its own; the file at
+    // src/pages/work/uae-india-aviation-assessment.astro owns the URL and
+    // reads client/year/accent from here for its hero meta, same pattern as
+    // uae-india-start-up-series.
+    id: 'uae-india-aviation-assessment',
     no: '02',
-    title: 'Monolith',
-    category: 'Visual System',
+    title: 'UAE-India Aviation Assessment',
+    category: 'Information Design',
     cat: 'design',
-    type: 'Art Direction',
-    year: '2023',
+    type: 'Editorial · Research',
+    year: '2025–26',
     accent: '#3ad8c8',
-    media: null,
-    client: 'Monolith Records',
-    role: 'Art Director',
-    services: ['Visual System', 'Cover Art', 'Layout'],
+    // A dedicated crop of the market-intelligence report's own cover photo
+    // (engine + tarmac, below its embassy crest/title band) — cropped from
+    // the source PDF rather than the rendered deck page, so the home-page
+    // thumbnail, gallery card and case-study hero never risk showing that
+    // baked-in title text at some other aspect ratio.
+    media: '/img/work/uae-india-aviation-assessment/hero-bg.jpg',
+    client: 'Embassy of the United Arab Emirates, New Delhi',
+    role: 'Information Designer',
+    services: ['Editorial Design', 'Data Visualisation', 'Layout Systems'],
     description: [
-      'A modular visual language for an independent record label, designed to flex across dozens of releases while staying unmistakably theirs.',
-      'Bold grids, heavy type and a restrained palette let the music — and the artwork — do the talking.',
+      'Two recurring publications for the UAE Embassy in New Delhi: a parliamentary briefing that maps which Indian MPs are vocal on aviation policy, and a monthly market-intelligence report tracking UAE-India air capacity and route economics.',
+      'Both run on the same editorial system — one grid, one chart language — built to be re-populated with new data each cycle rather than redesigned from scratch.',
     ],
-    // DEMO CONTENT — replace when this case study is written up.
+    // Not read by the bespoke page above (it defines its own page images),
+    // kept for completeness / in case a templated fallback is ever needed.
     gallery: [
       {
         type: 'doc',
         src: `${R2}/UAE-India%20Monthly%20Aviation%20Report.pdf`,
         label: 'UAE-India Market Intelligence Report',
         meta: 'PDF · 11 pages · 8.8 MB',
-        cover: '/img/work/monolith/uae-india-monthly-aviation-report-cover.jpg',
+        cover: '/img/work/uae-india-aviation-assessment/market-intelligence-report/page-01.jpg',
       },
     ],
   },

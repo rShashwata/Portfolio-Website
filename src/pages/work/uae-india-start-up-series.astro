@@ -93,26 +93,26 @@ const reels: Reel[] = [
   {
     src: `${R2}/UISS_Promo_Videos/Application_Process.mp4`,
     poster: '/img/work/uae-india-start-up-series/promotions/posters/application-process-poster.png',
-    label: 'How to apply — application walkthrough',
-    meta: '655K views · Instagram Reels',
+    label: 'How to apply - application walkthrough',
+    meta: 'To show where and how to apply for UISS 1.0, a short reel walked founders through the application process and the eligibility criteria.',
   },
   {
     src: `${R2}/UISS_Promo_Videos/Start-Up_Question_Interview.mp4`,
     poster: '/img/work/uae-india-start-up-series/promotions/posters/startup-question-poster.png',
-    label: 'Street interview — "What comes to mind when you think Start-ups?"',
-    meta: '1.4M views · Instagram Reels',
+    label: 'What comes to mind when you think about Start-ups? - Intercept interview',
+    meta: 'We asked the Launch event attendees a simple question  what comes to mind when you think of Start-Ups? The answers were compiled into a short reel to show the diversity of thought and the common themes that emerged.',
   },
   {
     src: `${R2}/UISS_Promo_Videos/MoU_Signing_Masters'_Union_Gurugram.mp4`,
     poster: '/img/work/uae-india-start-up-series/promotions/posters/mou-signing-poster.png',
-    label: "MoU signing — Masters' Union, Gurugram",
-    meta: '23.3K views · Instagram Reels', // <<VERIFY — matched to the handshake grid tile>>
+    label: "Masters' Union - MoU signing",
+    meta: 'Roadshow reel showing one of the MoU signings done with Masters Union', // <<VERIFY — matched to the handshake grid tile>>
   },
   {
     src: `${R2}/UISS_Promo_Videos/Top_500_Shortlisted.mp4`,
     poster: '/img/work/uae-india-start-up-series/promotions/posters/top-500-poster.png',
-    label: 'Top 500 shortlisted — milestone announcement',
-    meta: '<<PLACEHOLDER — view count not visible in the grid screenshots>> · Instagram Reels',
+    label: 'Top 500 shortlisted - Milestone announcement',
+    meta: 'Announcing the Top 500 shortlisted applicants for UISS 1.0, a short reel was created to show the milestone and the diversity of the applicants.', // <<VERIFY — matched to the grid tile>>
   },
 ];
 
@@ -1494,7 +1494,6 @@ const metaDescription =
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap-tight);
-    margin-top: var(--stack);
   }
   .uiss__promo-stats .uiss__ux-card {
     flex: 1 1 0;
@@ -1503,6 +1502,14 @@ const metaDescription =
   .uiss__promo-subhead {
     margin-top: var(--stack);
     margin-bottom: 0.8rem;
+  }
+  /* Element+class, not another bare `.uiss__promo-subhead` rule: this needs
+     to outrank `.uiss__ux-title`'s `--accent-ink` (defined later in the file,
+     so equal specificity would win on source order alone). This eyebrow sits
+     over a reel grid whose corners flash every accent color there is, so it
+     reads as plain theme text instead of competing with them. */
+  h4.uiss__promo-subhead {
+    color: var(--fg);
   }
 
   /* The reach proof: one paged frame for the two Instagram Insights

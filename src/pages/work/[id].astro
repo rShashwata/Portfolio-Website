@@ -12,7 +12,7 @@ export function getStaticPaths() {
   // overwrites this template's output at build time. Declared inside the
   // function because Astro hoists getStaticPaths out of the frontmatter scope —
   // a module-level const is not in scope by the time it runs.
-  const bespoke = ['uae-india-start-up-series'];
+  const bespoke = ['uae-india-start-up-series', 'uae-india-aviation-assessment'];
   return projects
     .map((p, i) => ({
       params: { id: p.id },
