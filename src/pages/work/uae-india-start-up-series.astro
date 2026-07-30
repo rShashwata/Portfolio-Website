@@ -121,14 +121,14 @@ const reels: Reel[] = [
 type ProofShot = { src: string | null; caption: string; metric: string };
 const igProof: ProofShot[] = [
   {
-    src: '/img/work/uae-india-start-up-series/promotions/application-process-viewership.png',
-    caption: '"How to apply" reel — Instagram Insights',
-    metric: '655K views',
+    src: '/img/work/uae-india-start-up-series/promotions/startup-question-reel-viewership.png',
+    caption: '"What comes to mind when you think of Start-Ups?" reel',
+    metric: '1.4M views',
   },
   {
-    src: '/img/work/uae-india-start-up-series/promotions/startup-question-reel-viewership.png',
-    caption: 'Street-interview reel — Instagram Insights',
-    metric: '1.4M views',
+    src: '/img/work/uae-india-start-up-series/promotions/application-process-viewership.png',
+    caption: '"How to apply" reel',
+    metric: '655K views',
   },
 ];
 
@@ -138,11 +138,11 @@ const igProof: ProofShot[] = [
 const promoStats: { label: string; text: string }[] = [
   {
     label: '10,000+ applications',
-    text: 'Received in a single application cycle, direct from the reach these reels built — not the Council’s existing mailing list.',
+    text: 'Received in a single application cycle, direct from the reach these reels built.',
   },
   {
-    label: '1.5M peak views',
-    text: 'On the highest-performing single reel, organic — no paid media behind the campaign.',
+    label: '1.4M peak views',
+    text: 'On the highest-performing single reel.',
   },
 ];
 
@@ -749,34 +749,83 @@ const metaDescription =
           >
             <div class="uiss__promo-head">
               <div class="uiss__panel-copy">
-                <h3 class="uiss__panel-title display">Promotional Content</h3>
-                <p>
-                  The campaign was the programme's reach engine, not collateral bolted on after the
-                  event. Deadline reminders, the street-interview hook, the MoU signing and the
-                  year-end wrap all ran as native vertical Reels — cut for a phone screen first,
-                  never resized down from a landscape master.
-                </p>
-                <p>
-                  Shot and assembled from event footage the same week it was captured, graded for a
-                  confident institutional look and subtitled throughout, since most of the audience
-                  watched with the sound off. The real measure of it: over 10,000 applications in a
-                  single cycle, pulled from founders the Council's own mailing list never touched.
-                </p>
+                <div class="uiss__promo-copy-body">
+                  <h3 class="uiss__panel-title display">Campaign Highlights</h3>
+                  <p>
+                    The campaign was the programme's reach engine, not collateral bolted on after
+                    the event. Deadline reminders, the street-interview hook, the MoU signing and
+                    the year-end wrap all ran as native vertical Reels.
+                  </p>
+                  <p>
+                    Shot and assembled from event footage the same week it was captured, graded for
+                    a confident institutional look and subtitled throughout, since most of the
+                    audience watched with the sound off. The real measure of it: over 10,000
+                    applications in a single cycle, pulled from founders the Council's own mailing
+                    list never touched.
+                  </p>
+                </div>
+
+                <div class="uiss__promo-stats">
+                  {
+                    promoStats.map((stat) => (
+                      <div class="uiss__ux-card">
+                        <span class="uiss__ux-card-label">{stat.label}</span>
+                        <p>{stat.text}</p>
+                      </div>
+                    ))
+                  }
+                </div>
               </div>
 
-              <div class="uiss__promo-stats">
-                {
-                  promoStats.map((stat) => (
-                    <div class="uiss__ux-card">
-                      <span class="uiss__ux-card-label">{stat.label}</span>
-                      <p>{stat.text}</p>
-                    </div>
-                  ))
-                }
+              <!-- The reach proof, one paged frame rather than a static 2-up
+                   grid — same viewer as the Event Branding photo carousel
+                   (`data-guide-viewer` / `data-guide-page`), just a second,
+                   independent instance of it. -->
+              <div class="uiss__proof-viewer" data-guide-viewer>
+                <div class="uiss__proof-frame">
+                  {
+                    igProof.map((shot, i) => (
+                      <figure
+                        class:list={['uiss__proof-slide', { 'is-active': i === 0 }]}
+                        data-guide-page
+                      >
+                        {shot.src ? (
+                          <img src={shot.src} alt={shot.caption} loading={i === 0 ? 'eager' : 'lazy'} />
+                        ) : (
+                          <span class="uiss__ph">
+                            <span>Screenshot coming soon</span>
+                          </span>
+                        )}
+                        <figcaption class="uiss__proof-cap">
+                          <span class="uiss__proof-metric">{shot.metric}</span>
+                          <span>{shot.caption}</span>
+                        </figcaption>
+                      </figure>
+                    ))
+                  }
+                </div>
+                <div class="uiss__guide-controls">
+                  <button
+                    type="button"
+                    class="uiss__guide-btn"
+                    data-guide-prev
+                    aria-label="Previous screenshot"
+                    disabled
+                    set:html={ARROW_PREV}
+                  />
+                  <span class="uiss__guide-count" data-guide-count>{`1 / ${igProof.length}`}</span>
+                  <button
+                    type="button"
+                    class="uiss__guide-btn"
+                    data-guide-next
+                    aria-label="Next screenshot"
+                    set:html={ARROW_NEXT}
+                  />
+                </div>
               </div>
             </div>
 
-            <h4 class="uiss__ux-title uiss__promo-subhead">The Films</h4>
+            <h4 class="uiss__ux-title uiss__promo-subhead">The Insta Reels</h4>
             <div class="uiss__reels">
               {
                 reels.map((reel) => (
@@ -801,31 +850,6 @@ const metaDescription =
                     <figcaption>
                       <span class="uiss__reel-label">{reel.label}</span>
                       <span>{reel.meta}</span>
-                    </figcaption>
-                  </figure>
-                ))
-              }
-            </div>
-
-            <h4 class="uiss__ux-title uiss__promo-subhead">The Reach</h4>
-            <p class="uiss__promo-note">
-              A slice of the Instagram grid from the cycle — individual reels clearing half a
-              million to 1.5M views apiece, all organic.
-            </p>
-            <div class="uiss__proof-grid">
-              {
-                igProof.map((shot) => (
-                  <figure class="uiss__proof-figure">
-                    {shot.src ? (
-                      <img src={shot.src} alt={shot.caption} loading="lazy" />
-                    ) : (
-                      <span class="uiss__ph">
-                        <span>Screenshot coming soon</span>
-                      </span>
-                    )}
-                    <figcaption>
-                      <span class="uiss__proof-metric">{shot.metric}</span>
-                      <span>{shot.caption}</span>
                     </figcaption>
                   </figure>
                 ))
@@ -1377,6 +1401,11 @@ const metaDescription =
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap);
+    /* The reels' width is capped via --reel-h, not fluid, so a row rarely
+       fills the column exactly. `space-between` puts the leftover into the
+       gaps between clips instead of stranding it after the last one — the
+       first and last reel in any row still sit flush with the margins. */
+    justify-content: space-between;
   }
   .uiss__reel {
     display: flex;
@@ -1431,67 +1460,102 @@ const metaDescription =
     color: var(--fg);
   }
 
-  /* Intro copy + stat cards on the page's shared grid — text left, capped at
-     62ch, with the two cards stacked in the column space that measure leaves
-     open on the right instead of sitting as a separate full-width row. */
+  /* Intro copy (+ stat row) left, the reach-proof frame right — the page's
+     shared grid, text capped at 62ch as everywhere else on it. */
+  /* `stretch`, not `start`: the proof viewer's height is set by its 16:9
+     image at whatever width the wider 1.4fr column gives it, which is rarely
+     the same height as the write-up. Stretching both columns to the taller
+     one is what lets the stat row below sit flush with the viewer's bottom
+     edge instead of stranding above it. */
   .uiss__promo-head {
     display: grid;
     grid-template-columns: var(--col);
-    align-items: start;
+    align-items: stretch;
     gap: var(--col-gap);
+  }
+  /* Two children now: the heading+copy group, and the stat row. `space-between`
+     keeps the group at the top and pushes the stats to the bottom of the
+     stretched column — a no-op anywhere else `.uiss__panel-copy` is used,
+     since those aren't in a stretched grid and have no spare height to give. */
+  .uiss__promo-head .uiss__panel-copy {
+    justify-content: space-between;
+  }
+  .uiss__promo-copy-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
   /* Stat cards reuse the UI-tab's card/label styling (`.uiss__ux-card`)
      directly rather than a parallel set of rules — same visual language, one
-     panel over from where it's defined. Stacked, not the UI tab's auto-fit
-     row: two cards side by side here would each be too narrow against a
-     1.4fr column to read comfortably. */
+     panel over from where it's defined. Side by side, sitting under the
+     write-up rather than beside it: this column is capped at 62ch, too narrow
+     to hold two cards and the proof frame all in one row. */
   .uiss__promo-stats {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: var(--gap-tight);
+    margin-top: var(--stack);
+  }
+  .uiss__promo-stats .uiss__ux-card {
+    flex: 1 1 0;
+    min-width: 200px;
   }
   .uiss__promo-subhead {
     margin-top: var(--stack);
     margin-bottom: 0.8rem;
   }
-  .uiss__promo-note {
-    margin-bottom: 1rem;
-    max-width: 62ch;
-    color: var(--fg-dim);
-  }
 
-  /* "The Reach": the two Instagram-grid screenshots. Square, not the reels'
-     9:16 — these are Insights captures of the grid itself, cropped 1:1. */
-  .uiss__proof-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    align-items: start;
-    gap: var(--gap);
-  }
-  .uiss__proof-figure {
+  /* The reach proof: one paged frame for the two Instagram Insights
+     screenshots, not a static 2-up grid — the same `data-guide-viewer`
+     pattern as the Event Branding photo carousel (`.uiss__shot-*`), just its
+     own instance with square slides instead of 3:2 ones. Only relevant
+     without JS, where both slides stack instead of paging. */
+  .uiss__proof-frame {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.8rem;
   }
-  .uiss__proof-figure :is(img, .uiss__ph) {
+  .uiss__proof-slide {
+    position: relative;
+  }
+  /* `height: auto`, not a fixed aspect-ratio box with `object-fit: cover` —
+     cover crops whenever the box and the image don't share EXACTLY the same
+     ratio, and these screenshots aren't guaranteed to stay 16:9 forever. This
+     way the full screenshot always shows, at whatever height its own ratio
+     gives a 100%-wide slide; the placeholder alone keeps a 16:9 box, since it
+     has no intrinsic size of its own to size from. */
+  .uiss__proof-slide img {
+    display: block;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    height: auto;
     border-radius: var(--r);
-    object-fit: contain;
-    background: var(--bg-soft);
-    border: 1px solid var(--line);
   }
-  .uiss__proof-figure figcaption {
+  .uiss__proof-slide .uiss__ph {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--r);
+    background: var(--bg-soft);
+  }
+  /* Caption over the screenshot, not under it — same treatment as the
+     branding carousel's `.uiss__shot-cap`, fixed light-on-scrim in both
+     themes since it sits on a photo rather than on --bg. */
+  .uiss__proof-cap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    padding: 2.4rem 1rem 0.9rem;
+    border-radius: 0 0 var(--r) var(--r);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent);
+    color: #f4f0e6;
     font-size: var(--step--1);
-    color: var(--fg-dim);
   }
   .uiss__proof-metric {
     font-weight: 700;
     font-size: var(--step-0);
-    color: var(--accent-ink);
   }
 
   /* ── UI Design ──────────────────────────────────────────────────────── */
